@@ -1,3 +1,12 @@
+document.getElementById('select-theme').addEventListener('change', function() {
+    const theme = this.value;
+    if (theme === 'dark') {
+        document.body.classList.add('dark-theme');
+    } else {
+        document.body.classList.remove('dark-theme');
+    }
+});
+
 class Solo {
     constructor(tipo, coesao, anguloAtritoInterno, resistenciaPenetracao, diametro) {
         this.tipo = tipo;
@@ -55,6 +64,8 @@ document.getElementById('calcular').addEventListener('click', () => {
     calculo.estimarTamanhoEstaca();
     calculo.calcularQuantidadeEstaca();
 
+
+    //Não mexer daqui para baixo
     document.getElementById('resultados-container').innerHTML = calculo.exibirResultados();
 
     // Salvar resultados no objeto calculo para exportação

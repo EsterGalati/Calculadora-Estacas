@@ -122,3 +122,18 @@ section:not(.ativo) {
         transform: translateY(0);
     }
 }
+
+/* Tema Escuro No css */
+.dark-theme {
+    background-color: #333;
+    color: #fff;
+}
+
+.dark-theme header {
+    background-color: #1a1a1a;
+}
+
+.dark-theme button,
+.dark-theme #exportar-pdf {
+    background-color: #444;
+}
