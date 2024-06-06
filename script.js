@@ -74,17 +74,41 @@ document.getElementById('exportar-pdf').addEventListener('click', () => {
     doc.save('resultados-dimensionamento-estacas.pdf');
 });
 
+let usuarioCadastrado = null;
+
 document.getElementById('cadastrar').addEventListener('click', () => {
     const nome = document.getElementById('nome').value;
     const email = document.getElementById('email').value;
     const senha = document.getElementById('senha').value;
 
     if (nome && email && senha) {
-        // Simulando o salvamento do cadastro
+        usuarioCadastrado = { nome, email }; // Salvar informações do usuário
         alert('Cadastro realizado com sucesso!');
         document.getElementById('cadastro').classList.remove('ativo');
         document.getElementById('entrada-dados').classList.add('ativo');
     } else {
         alert('Por favor, preencha todos os campos.');
+    }
+});
+
+// Adiciona um evento de clique ao botão de exibir informações de cadastro
+document.getElementById('exibir-info-cadastro').addEventListener('click', () => {
+    const nome = localStorage.getItem('nome');
+    const email = localStorage.getItem('email');
+
+    // Exibe as informações no container
+    document.getElementById('info-cadastro').innerText = 
+    `Nome: ${nome} 
+    Email: ${email}`;
+    document.getElementById('info-cadastro').style.display = 'block';
+});
+
+// Evento para esconder o container quando clicar fora dele
+document.addEventListener('click', (event) => {
+    const infoCadastro = document.getElementById('info-cadastro');
+    const botaoInfo = document.getElementById('exibir-info-cadastro');
+
+    if (event.target !== infoCadastro && event.target !== botaoInfo) {
+        infoCadastro.style.display = 'none';
     }
 });
