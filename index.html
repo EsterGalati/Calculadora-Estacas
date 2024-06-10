@@ -5,26 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FoundaCalc</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <div id="profile-section" class="section active">
+    <div id="profile-page" class="page active">
+        <div class="container">
             <h1>Gerenciar Perfis</h1>
             <div class="input-container">
                 <label for="profileName">Nome do Perfil:</label>
                 <input type="text" id="profileName">
                 <br>
+                <label for="profileEmail">E-mail:</label>
+                <input type="email" id="profileEmail">
+                <br>
+                <label for="profilePhone">Telefone:</label>
+                <input type="tel" id="profilePhone">
+                <br>
                 <button id="addProfile-button">Adicionar Perfil</button>
                 <button id="updateProfile-button" style="display: none;">Atualizar Perfil</button>
+                <button id="cancelEdit-button" style="display: none;">Cancelar</button>
             </div>
             <div id="profileList"></div>
+            <button id="backToCalculator-button">Voltar para a Calculadora</button>
         </div>
+    </div>
 
-        <div id="calculator-section" class="section">
+    <div id="calculator-page" class="page">
+        <div class="container">
             <nav id="profile-nav" class="nav">
                 <span id="currentProfileName"></span>
-                <button id="editProfileNav-button">Editar Perfil</button>
-                <button id="deleteProfileNav-button">Excluir Perfil</button>
+                <div class="dropdown">
+                    <button class="dropbtn"><i class="fas fa-cog"></i></button>
+                    <div class="dropdown-content">
+                        <a href="#" id="editProfileNav-button">Editar Perfil</a>
+                        <a href="#" id="deleteProfileNav-button">Excluir Perfil</a>
+                    </div>
+                </div>
             </nav>
             <h1>FoundaCalc</h1>
             <div class="input-container">
@@ -32,7 +48,20 @@
                 <label for="tipoSolo">Tipo de Solo:</label>
                 <select id="tipoSolo">
                     <option value="Areia">Areia</option>
-                    <!-- Outras opções... -->
+                    <option value="Areia siltosa">Areia siltosa</option>
+                    <option value="Areia siltoargilosa">Areia siltoargilosa</option>
+                    <option value="Areia Argilosa">Areia Argilosa</option>
+                    <option value="Areia argilossiltosa">Areia argilossiltosa</option>
+                    <option value="Silte">Silte</option>
+                    <option value="Silte arenoso">Silte arenoso</option>
+                    <option value="Silte arenoargiloso">Silte arenoargiloso</option>
+                    <option value="Silte argiloso">Silte argiloso</option>
+                    <option value="Silte argiloarenoso">Silte argiloarenoso</option>
+                    <option value="Argila">Argila</option>
+                    <option value="Argila arenosa">Argila arenosa</option>
+                    <option value="Argila arenossiltosa">Argila arenossiltosa</option>
+                    <option value="Argila siltosa">Argila siltosa</option>
+                    <option value="Argila siltoarenosa">Argila siltoarenosa</option>
                 </select>
                 <br>
                 <label for="profundidade">Profundidade:</label>
@@ -46,21 +75,27 @@
                 <label for="categoriaEstaca">Categoria da Estaca:</label>
                 <select id="categoriaEstaca">
                     <option value="Pré-Moldada">Pré-Moldada</option>
-                    <!-- Outras opções... -->
+                    <option value="Moldada In-Loco">Moldada In-Loco</option>
                 </select>
                 <br>
                 <div id="preMoldadaOptions">
                     <label for="tipoPreMoldada">Tipo de Estaca:</label>
                     <select id="tipoPreMoldada">
                         <option value="Metalica">Metalica</option>
-                        <!-- Outras opções... -->
+                        <option value="Pré-Moldada cravada">Pré-Moldada cravada</option>
+                        <option value="Pré-Moldada prensada">Pré-Moldada prensada</option>
                     </select>
                 </div>
                 <div id="moldadaInLocoOptions" style="display: none;">
                     <label for="tipoMoldadaInLoco">Tipo de Estaca:</label>
                     <select id="tipoMoldadaInLoco">
                         <option value="Franki">Franki</option>
-                        <!-- Outras opções... -->
+                        <option value="Escavada pequeno diâmetro">Escavada pequeno diâmetro</option>
+                        <option value="Escavada grande diâmetro">Escavada grande diâmetro</option>
+                        <option value="Escavada com lama">Escavada com lama</option>
+                        <option value="Raiz">Raiz</option>
+                        <option value="Strauss">Strauss</option>
+                        <option value="Hélice contínua">Hélice contínua</option>
                     </select>
                 </div>
                 <br>
@@ -82,6 +117,7 @@
             </div>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
