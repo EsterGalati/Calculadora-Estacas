@@ -9,16 +9,20 @@ body, html {
     background-color: #f0f0f0;
     font-family: Arial, sans-serif;
     box-sizing: border-box;
+    overflow: hidden; /* Para evitar a rolagem da página */
 }
 
 .container {
-    width: 100%;
+    width: 90%;
     max-width: 800px;
     background-color: white;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin: 20px;
+    padding-top: 80px; /* Espaço para a barra de navegação fixa */
+    overflow-y: auto; /* Garantir que o conteúdo interno seja rolável se necessário */
+    height: calc(100vh - 40px); /* Ajuste de altura para se adaptar à tela */
 }
 
 .input-container {
@@ -90,7 +94,14 @@ button:hover {
     background-color: #f1f1f1;
     padding: 10px;
     border-bottom: 1px solid #ccc;
-    margin-bottom: 20px;
+    width: 90%;
+    max-width: 800px;
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    box-sizing: border-box;
+    z-index: 1000;
 }
 
 .nav button {
@@ -149,4 +160,28 @@ button:hover {
 
 .dropdown:hover .dropbtn {
     background-color: #0056b3;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+    .container {
+        padding: 10px;
+        padding-top: 80px; /* Espaço para a barra de navegação fixa */
+        height: calc(100vh - 20px); /* Ajuste de altura para se adaptar à tela */
+    }
+    
+    input, select, button {
+        padding: 8px;
+        font-size: 14px;
+    }
+    
+    .nav {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 90%;
+    }
+    
+    .dropdown-content {
+        min-width: 120px;
+    }
 }

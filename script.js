@@ -3,22 +3,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const preMoldadaOptions = document.getElementById('preMoldadaOptions');
     const moldadaInLocoOptions = document.getElementById('moldadaInLocoOptions');
     const calcularButton = document.getElementById('calcular-button');
+    const exportPdfButton = document.getElementById('exportPdf-button');
     const resultadosDiv = document.getElementById('resultados');
     const metodoCalculo = document.getElementById('metodoCalculo');
 
     const addProfileButton = document.getElementById('addProfile-button');
     const updateProfileButton = document.getElementById('updateProfile-button');
-    const cancelEditButton = document.getElementById('cancelEdit-button');
     const profileNameInput = document.getElementById('profileName');
     const profileEmailInput = document.getElementById('profileEmail');
     const profilePhoneInput = document.getElementById('profilePhone');
+    const inputContainer = document.getElementById('input-container');
     const profileList = document.getElementById('profileList');
     const profilePage = document.getElementById('profile-page');
     const calculatorPage = document.getElementById('calculator-page');
     const currentProfileName = document.getElementById('currentProfileName');
     const editProfileNavButton = document.getElementById('editProfileNav-button');
     const deleteProfileNavButton = document.getElementById('deleteProfileNav-button');
-    const backToCalculatorButton = document.getElementById('backToCalculator-button');
 
     let profiles = JSON.parse(localStorage.getItem('profiles')) || [];
     let currentProfileIndex = profiles.length > 0 ? 0 : null;
@@ -92,6 +92,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
     calcularButton.addEventListener('click', calculateResults);
 
+    function exportResultsToPdf() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.text("Resultados da Calculadora FoundaCalc", 10, 10);
+        let y = 20;
+
+        const resultsText = resultadosDiv.innerText.split('\n');
+        resultsText.forEach(line => {
+            doc.text(line, 10, y);
+            y += 10;
+        });
+
+        doc.save("resultados.pdf");
+    }
+
+    exportPdfButton.addEventListener('click', exportResultsToPdf);
+
     function renderProfiles() {
         profileList.innerHTML = '';
         if (profiles.length > 0) {
@@ -106,6 +124,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             `;
             profileList.appendChild(profileItem);
+        } else {
+            inputContainer.style.display = 'block';
+            addProfileButton.style.display = 'inline-block';
         }
     }
 
@@ -117,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
         profilePhoneInput.value = profile.phone;
         addProfileButton.style.display = 'none';
         updateProfileButton.style.display = 'inline-block';
-        cancelEditButton.style.display = 'inline-block';
+        inputContainer.style.display = 'block';
         profilePage.classList.add('active');
         calculatorPage.classList.remove('active');
     }
@@ -130,21 +151,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     addProfileButton.addEventListener('click', function () {
-        if (profiles.length === 0) {
-            const profileName = profileNameInput.value.trim();
-            const profileEmail = profileEmailInput.value.trim();
-            const profilePhone = profilePhoneInput.value.trim();
-            if (profileName && profileEmail && profilePhone) {
-                profiles = [{ name: profileName, email: profileEmail, phone: profilePhone }];
-                localStorage.setItem('profiles', JSON.stringify(profiles));
-                profileNameInput.value = '';
-                profileEmailInput.value = '';
-                profilePhoneInput.value = '';
-                renderProfiles();
-                switchToCalculatorPage(profileName);
-            }
+        const profileName = profileNameInput.value.trim();
+        const profileEmail = profileEmailInput.value.trim();
+        const profilePhone = profilePhoneInput.value.trim();
+        if (profileName && profileEmail && profilePhone) {
+            profiles = [{ name: profileName, email: profileEmail, phone: profilePhone }];
+            localStorage.setItem('profiles', JSON.stringify(profiles));
+            profileNameInput.value = '';
+            profileEmailInput.value = '';
+            profilePhoneInput.value = '';
+            renderProfiles();
+            switchToCalculatorPage(profileName);
         } else {
-            alert("Você só pode adicionar um perfil. Exclua o perfil existente antes de adicionar um novo.");
+            alert("Por favor, preencha todos os campos.");
         }
     });
 
@@ -159,16 +178,10 @@ document.addEventListener('DOMContentLoaded', function () {
             profileEmailInput.value = '';
             profilePhoneInput.value = '';
             currentProfileIndex = null;
-            addProfileButton.style.display = 'inline-block';
             updateProfileButton.style.display = 'none';
-            cancelEditButton.style.display = 'none';
             renderProfiles();
             switchToCalculatorPage(profileName);
         }
-    });
-
-    cancelEditButton.addEventListener('click', function () {
-        switchToProfilePage();
     });
 
     editProfileNavButton.addEventListener('click', function () {
@@ -178,6 +191,9 @@ document.addEventListener('DOMContentLoaded', function () {
             profileNameInput.value = profile.name;
             profileEmailInput.value = profile.email;
             profilePhoneInput.value = profile.phone;
+            updateProfileButton.style.display = 'inline-block';
+            addProfileButton.style.display = 'none';
+            inputContainer.style.display = 'block';
             switchToProfilePage();
         }
     });
@@ -189,14 +205,6 @@ document.addEventListener('DOMContentLoaded', function () {
             localStorage.setItem('profiles', JSON.stringify(profiles));
             renderProfiles();
             switchToProfilePage();
-        }
-    });
-
-    backToCalculatorButton.addEventListener('click', function () {
-        if (profiles.length > 0) {
-            switchToCalculatorPage(profiles[0].name);
-        } else {
-            switchToCalculatorPage('');
         }
     });
 
@@ -218,17 +226,25 @@ document.addEventListener('DOMContentLoaded', function () {
         profileNameInput.value = '';
         profileEmailInput.value = '';
         profilePhoneInput.value = '';
+        inputContainer.style.display = 'block';
         currentProfileIndex = null;
-        addProfileButton.style.display = 'inline-block';
+        if (profiles.length === 0) {
+            addProfileButton.style.display = 'inline-block';
+        } else {
+            addProfileButton.style.display = 'none';
+        }
         updateProfileButton.style.display = 'none';
-        cancelEditButton.style.display = 'none';
         profilePage.classList.add('active');
         calculatorPage.classList.remove('active');
     }
 
+    // Render profiles on page load
     renderProfiles();
 
+    // Auto-fill if there's a profile and switch to calculator page
     if (profiles.length > 0) {
         switchToCalculatorPage(profiles[0].name);
+    } else {
+        addProfileButton.style.display = 'inline-block';
     }
 });
