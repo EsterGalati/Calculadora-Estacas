@@ -1,3 +1,62 @@
+
+
+
+/* Estilos para a página inicial */
+#welcome-page {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: url('planodefundo.jpg') no-repeat center center/cover;
+}
+
+#welcome-page .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Plano de fundo com opacidade */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#welcome-page .container {
+    position: relative;
+    z-index: 1;
+    background-color: rgba(255, 255, 255, 0.9); /* Container com opacidade */
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#welcome-page h1, #welcome-page p {
+    color: var(--text-color);
+}
+
+#welcome-page button {
+    width: auto;
+    padding: 10px 20px;
+    margin-top: auto; /* Empurra o botão para a parte inferior */
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: none;
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    font-size: 16px;
+    cursor: pointer;
+    align-self: center; /* Centraliza o botão horizontalmente */
+}
+
+#welcome-page button:hover {
+    background-color: var(--button-hover-bg-color);
+}
+
 body {
     background-color: var(--bg-color);
     color: var(--text-color);

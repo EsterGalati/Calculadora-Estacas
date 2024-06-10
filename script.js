@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
+    const startButton = document.getElementById('start-button');
+    const welcomePage = document.getElementById('welcome-page');
+    const profilePage = document.getElementById('profile-page');
+    const calculatorPage = document.getElementById('calculator-page');
     const categoriaEstaca = document.getElementById('categoriaEstaca');
     const preMoldadaOptions = document.getElementById('preMoldadaOptions');
     const moldadaInLocoOptions = document.getElementById('moldadaInLocoOptions');
@@ -15,8 +19,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const profilePhoneInput = document.getElementById('profilePhone');
     const inputContainer = document.getElementById('input-container');
     const profileList = document.getElementById('profileList');
-    const profilePage = document.getElementById('profile-page');
-    const calculatorPage = document.getElementById('calculator-page');
     const currentProfileName = document.getElementById('currentProfileName');
     const editProfileNavButton = document.getElementById('editProfileNav-button');
     const deleteProfileNavButton = document.getElementById('deleteProfileNav-button');
@@ -114,17 +116,18 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderProfiles() {
         profileList.innerHTML = '';
         if (profiles.length > 0) {
-            const profile = profiles[0];
-            const profileItem = document.createElement('div');
-            profileItem.className = 'profile-item';
-            profileItem.innerHTML = `
-                <span>${profile.name}</span>
-                <div>
-                    <button onclick="editProfile(0)">Editar</button>
-                    <button onclick="deleteProfile(0)">Excluir</button>
-                </div>
-            `;
-            profileList.appendChild(profileItem);
+            profiles.forEach((profile, index) => {
+                const profileItem = document.createElement('div');
+                profileItem.className = 'profile-item';
+                profileItem.innerHTML = `
+                    <span>${profile.name}</span>
+                    <div>
+                        <button onclick="editProfile(${index})">Editar</button>
+                        <button onclick="deleteProfile(${index})">Excluir</button>
+                    </div>
+                `;
+                profileList.appendChild(profileItem);
+            });
         } else {
             inputContainer.style.display = 'block';
             addProfileButton.style.display = 'inline-block';
@@ -219,6 +222,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 profilePhoneInput.value = profile.phone;
             }
         }
+        welcomePage.classList.remove('active');
         profilePage.classList.remove('active');
         calculatorPage.classList.add('active');
     }
@@ -235,9 +239,18 @@ document.addEventListener('DOMContentLoaded', function () {
             addProfileButton.style.display = 'none';
         }
         updateProfileButton.style.display = 'none';
+        welcomePage.classList.remove('active');
         profilePage.classList.add('active');
         calculatorPage.classList.remove('active');
     }
+
+    startButton.addEventListener('click', function() {
+        if (profiles.length > 0) {
+            switchToCalculatorPage(profiles[0].name);
+        } else {
+            switchToProfilePage();
+        }
+    });
 
     // Render profiles on page load
     renderProfiles();

@@ -8,7 +8,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    <div id="profile-page" class="page active">
+    <!-- Página Inicial -->
+    <div id="welcome-page" class="page active">
+        <div class="overlay">
+            <div class="container">
+                <h1>Bem-vindo a sua Calculadora de Estacas</h1>
+                <p>A ferramenta definitiva para calcular estacas de fundação. 
+                    Clique no botão abaixo para começar.</p>
+                <button id="start-button">Iniciar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Página de Perfil -->
+    <div id="profile-page" class="page">
         <div class="container">
             <h1>Perfil</h1>
             <div id="input-container" class="input-container" style="display: none;">
@@ -28,6 +41,7 @@
         </div>
     </div>
 
+    <!-- Página de Calculadora -->
     <div id="calculator-page" class="page">
         <div class="container">
             <nav id="profile-nav" class="nav">
@@ -37,7 +51,7 @@
                     <div class="dropdown-content">
                         <a href="#" id="editProfileNav-button">Editar Perfil</a>
                         <a href="#" id="deleteProfileNav-button">Excluir Perfil</a>
-                        <a href="#" id="toggleTheme-button">Alternar Tema</a> <!-- Novo item para alternar o tema -->
+                        <a href="#" id="toggleTheme-button">Alternar Tema</a>
                     </div>
                 </div>
             </nav>
