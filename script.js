@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const exportPdfButton = document.getElementById('exportPdf-button');
     const resultadosDiv = document.getElementById('resultados');
     const metodoCalculo = document.getElementById('metodoCalculo');
+    const toggleThemeButton = document.getElementById('toggleTheme-button');
 
     const addProfileButton = document.getElementById('addProfile-button');
     const updateProfileButton = document.getElementById('updateProfile-button');
@@ -247,4 +248,29 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         addProfileButton.style.display = 'inline-block';
     }
+
+    // Theme toggle functionality
+    function toggleTheme() {
+        document.body.classList.toggle('dark-theme');
+        if (document.body.classList.contains('dark-theme')) {
+            localStorage.setItem('theme', 'dark');
+        } else {
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    // Load theme from localStorage
+    function loadTheme() {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark') {
+            document.body.classList.add('dark-theme');
+        } else {
+            document.body.classList.remove('dark-theme');
+        }
+    }
+
+    toggleThemeButton.addEventListener('click', toggleTheme);
+
+    // Load theme on page load
+    loadTheme();
 });
