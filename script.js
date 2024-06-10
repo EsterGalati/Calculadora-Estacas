@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
-        doc.text("Resultados da Calculadora FoundaCalc", 10, 10);
+        doc.text("Resultados da Calculadora", 10, 10);
         let y = 20;
 
         const resultsText = resultadosDiv.innerText.split('\n');
