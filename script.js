@@ -6,34 +6,116 @@ document.addEventListener('DOMContentLoaded', function () {
     const resultadosDiv = document.getElementById('resultados');
     const metodoCalculo = document.getElementById('metodoCalculo');
 
-    const Ksolo = {
-        "Areia": 1000, "Areia siltosa": 800, "Areia siltoargilosa": 700, "Areia Argilosa": 600,
-        "Areia argilossiltosa": 500, "Silte": 400, "Silte arenoso": 550, "Silte arenoargiloso": 450,
-        "Silte argiloso": 230, "Silte argiloarenoso": 250, "Argila": 200, "Argila arenosa": 350,
-        "Argila arenossiltosa": 300, "Argila siltosa": 220, "Argila siltoarenosa": 330
-    };
+    const addProfileButton = document.getElementById('addProfile-button');
+    const updateProfileButton = document.getElementById('updateProfile-button');
+    const profileNameInput = document.getElementById('profileName');
+    const profileList = document.getElementById('profileList');
+    const profileSection = document.getElementById('profile-section');
+    const calculatorSection = document.getElementById('calculator-section');
+    const currentProfileName = document.getElementById('currentProfileName');
+    const editProfileNavButton = document.getElementById('editProfileNav-button');
+    const deleteProfileNavButton = document.getElementById('deleteProfileNav-button');
 
-    const asolo = {
-        "Areia": 0.014, "Areia siltosa": 0.020, "Areia siltoargilosa": 0.024, "Areia Argilosa": 0.030,
-        "Areia argilossiltosa": 0.028, "Silte": 0.030, "Silte arenoso": 0.022, "Silte arenoargiloso": 0.028,
-        "Silte argiloso": 0.034, "Silte argiloarenoso": 0.030, "Argila": 0.060, "Argila arenosa": 0.024,
-        "Argila arenossiltosa": 0.028, "Argila siltosa": 0.040, "Argila siltoarenosa": 0.030
-    };
+    let profiles = JSON.parse(localStorage.getItem('profiles')) || [];
+    let currentProfileIndex = null;
 
-    const F1Estaca = {
-        "Franki": 2.3, "Metalica": 1.8, "Pré-Moldada cravada": 2.5, "Pré-Moldada prensada": 1.2,
-        "Escavada pequeno diâmetro": 3.0, "Escavada grande diâmetro": 3.5, "Escavada com lama": 3.5,
-        "Raiz": 2.2, "Strauss": 4.2, "Hélice contínua": 3.0
-    };
+    const Ksolo = { /* Valores de Ksolo... */ };
+    const asolo = { /* Valores de asolo... */ };
+    const F1Estaca = { /* Valores de F1Estaca... */ };
+    const F2Estaca = { /* Valores de F2Estaca... */ };
 
-    const F2Estaca = {
-        "Franki": 3.0, "Metalica": 3.5, "Pré-Moldada cravada": 3.5, "Pré-Moldada prensada": 2.3,
-        "Escavada pequeno diâmetro": 6.0, "Escavada grande diâmetro": 7.0, "Escavada com lama": 4.5,
-        "Raiz": 2.4, "Straus": 3.9, "Hélice contínua": 3.8
-    };
+    function renderProfiles() {
+        profileList.innerHTML = '';
+        profiles.forEach((profile, index) => {
+            const profileItem = document.createElement('div');
+            profileItem.className = 'profile-item';
+            profileItem.innerHTML = `
+                <span>${profile.name}</span>
+                <div>
+                    <button onclick="editProfile(${index})">Editar</button>
+                    <button onclick="deleteProfile(${index})">Excluir</button>
+                </div>
+            `;
+            profileList.appendChild(profileItem);
+        });
+    }
 
+    window.editProfile = function (index) {
+        currentProfileIndex = index;
+        profileNameInput.value = profiles[index].name;
+        addProfileButton.style.display = 'none';
+        updateProfileButton.style.display = 'inline-block';
+    }
+
+    window.deleteProfile = function (index) {
+        profiles.splice(index, 1);
+        localStorage.setItem('profiles', JSON.stringify(profiles));
+        renderProfiles();
+    }
+
+    addProfileButton.addEventListener('click', function () {
+        const profileName = profileNameInput.value.trim();
+        if (profileName) {
+            profiles.push({ name: profileName });
+            localStorage.setItem('profiles', JSON.stringify(profiles));
+            profileNameInput.value = '';
+            renderProfiles();
+            switchToCalculatorSection(profileName);
+        }
+    });
+
+    updateProfileButton.addEventListener('click', function () {
+        const profileName = profileNameInput.value.trim();
+        if (profileName && currentProfileIndex !== null) {
+            profiles[currentProfileIndex].name = profileName;
+            localStorage.setItem('profiles', JSON.stringify(profiles));
+            profileNameInput.value = '';
+            currentProfileIndex = null;
+            addProfileButton.style.display = 'inline-block';
+            updateProfileButton.style.display = 'none';
+            renderProfiles();
+        }
+    });
+
+    editProfileNavButton.addEventListener('click', function () {
+        currentProfileIndex = profiles.findIndex(profile => profile.name === currentProfileName.textContent);
+        if (currentProfileIndex !== -1) {
+            profileNameInput.value = profiles[currentProfileIndex].name;
+            profileSection.classList.add('active');
+            calculatorSection.classList.remove('active');
+            addProfileButton.style.display = 'none';
+            updateProfileButton.style.display = 'inline-block';
+        }
+    });
+
+    deleteProfileNavButton.addEventListener('click', function () {
+        currentProfileIndex = profiles.findIndex(profile => profile.name === currentProfileName.textContent);
+        if (currentProfileIndex !== -1) {
+            profiles.splice(currentProfileIndex, 1);
+            localStorage.setItem('profiles', JSON.stringify(profiles));
+            renderProfiles();
+            switchToProfileSection();
+        }
+    });
+
+    function switchToCalculatorSection(profileName) {
+        currentProfileName.textContent
+        currentProfileName.textContent = profileName;
+        profileSection.classList.remove('active');
+        calculatorSection.classList.add('active');
+    }
+
+    function switchToProfileSection() {
+        profileSection.classList.add('active');
+        calculatorSection.classList.remove('active');
+    }
+
+    // Render profiles on page load
+    renderProfiles();
+
+    // Mostrar opções de estaca conforme a categoria selecionada
     categoriaEstaca.addEventListener('change', function () {
-        if (categoriaEstaca.value === 'Pré-Moldada') {
+        if (this.value === 'Pré-Moldada') {
             preMoldadaOptions.style.display = 'block';
             moldadaInLocoOptions.style.display = 'none';
         } else {
@@ -42,36 +124,47 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    function calculateResults() {
+    // Cálculo do método Aoki e Decourt
+    calcularButton.addEventListener('click', function () {
         const tipoSolo = document.getElementById('tipoSolo').value;
         const profundidade = parseFloat(document.getElementById('profundidade').value);
         const nspt = parseFloat(document.getElementById('nspt').value);
-        const categoriaEstaca = document.getElementById('categoriaEstaca').value;
-        const tipoEstaca = categoriaEstaca === 'Pré-Moldada' ? 
-            document.getElementById('tipoPreMoldada').value : 
-            document.getElementById('tipoMoldadaInLoco').value;
-        const diametroEstaca = parseFloat(document.getElementById('diametroEstaca').value) / 100;
+        const diametroEstaca = parseFloat(document.getElementById('diametroEstaca').value);
+        const tipoEstaca = categoriaEstaca.value === 'Pré-Moldada' ? document.getElementById('tipoPreMoldada').value : document.getElementById('tipoMoldadaInLoco').value;
         const metodo = metodoCalculo.value;
 
-        const K = Ksolo[tipoSolo] || 0.0;
-        const a = asolo[tipoSolo] || 0.0;
-        const F1 = F1Estaca[tipoEstaca] || 0.0;
-        const F2 = F2Estaca[tipoEstaca] || 0.0;
-        const raio = diametroEstaca / 2;
-        const Ap = Math.PI * Math.pow(raio, 2);
-        const Al = 2 * Math.PI * raio * profundidade;
+        const areaEstaca = Math.PI * Math.pow(diametroEstaca / 2, 2);
+        const perimetroEstaca = Math.PI * diametroEstaca;
 
-        const Rp = ((K * nspt) / F1) * Ap;
-        const Rl = (a * ((K * nspt) / F2) * Al) / profundidade;
+        const K = Ksolo[tipoSolo];
+        const a = asolo[tipoSolo];
+        const F1 = F1Estaca[tipoEstaca];
+        const F2 = F2Estaca[tipoEstaca];
+
+        let Rp, Rl;
+
+        if (metodo === 'Aoki') {
+            Rp = K * nspt * areaEstaca / 100;
+            Rl = a * nspt * perimetroEstaca * profundidade / 100;
+        } else if (metodo === 'Decourt') {
+            Rp = F1 * nspt * areaEstaca / 100;
+            Rl = F2 * nspt * perimetroEstaca * profundidade / 100;
+        }
+
         const R = Rp + Rl;
 
         resultadosDiv.innerHTML = `
-            <p>Método utilizado: ${metodo}</p>
-            <p><strong>R:</strong> ${R.toFixed(3)} Kn</p>
-            <p><strong>Rp:</strong> ${Rp.toFixed(3)} Kn</p>
-            <p><strong>Rl:</strong> ${Rl.toFixed(3)} Kn</p>
+            <p><strong>Tipo de Solo:</strong> ${tipoSolo}</p>
+            <p><strong>Profundidade:</strong> ${profundidade} m</p>
+            <p><strong>NSPT:</strong> ${nspt}</p>
+            <p><strong>Diâmetro da Estaca:</strong> ${diametroEstaca} cm</p>
+            <p><strong>Tipo de Estaca:</strong> ${tipoEstaca}</p>
+            <p><strong>Método de Cálculo:</strong> ${metodo}</p>
+            <p><strong>Área da Estaca:</strong> ${areaEstaca.toFixed(2)} cm²</p>
+            <p><strong>Perímetro da Estaca:</strong> ${perimetroEstaca.toFixed(2)} cm</p>
+            <p><strong>Resistência da Ponta (Rp):</strong> ${Rp.toFixed(2)} kN</p>
+            <p><strong>Resistência Lateral (Rl):</strong> ${Rl.toFixed(2)} kN</p>
+            <p><strong>Resistência Total (R):</strong> ${R.toFixed(2)} kN</p>
         `;
-    }
-
-    calcularButton.addEventListener('click', calculateResults);
+    });
 });

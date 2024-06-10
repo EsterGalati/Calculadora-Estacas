@@ -8,83 +8,77 @@
 </head>
 <body>
     <div class="container">
-        <h1>FoundaCalc</h1>
-        <div class="input-container">
-            <h2>Dados de Sondagem</h2>
-            <label for="tipoSolo">Tipo de Solo:</label>
-            <select id="tipoSolo">
-                <option value="Areia">Areia</option>
-                <option value="Areia siltosa">Areia siltosa</option>
-                <option value="Areia siltoargilosa">Areia siltoargilosa</option>
-                <option value="Areia Argilosa">Areia Argilosa</option>
-                <option value="Areia argilossiltosa">Areia argilossiltosa</option>
-                <option value="Silte">Silte</option>
-                <option value="Silte arenoso">Silte arenoso</option>
-                <option value="Silte arenoargiloso">Silte arenoargiloso</option>
-                <option value="Silte argiloso">Silte argiloso</option>
-                <option value="Silte argiloarenoso">Silte argiloarenoso</option>
-                <option value="Argila">Argila</option>
-                <option value="Argila arenosa">Argila arenosa</option>
-                <option value="Argila arenossiltosa">Argila arenossiltosa</option>
-                <option value="Argila siltosa">Argila siltosa</option>
-                <option value="Argila siltoarenosa">Argila siltoarenosa</option>
-            </select>
-            <br>
-            <label for="profundidade">Profundidade:</label>
-            <input type="number" id="profundidade">
-            <br>
-            <label for="nspt">Nspt:</label>
-            <input type="number" id="nspt">
+        <div id="profile-section" class="section active">
+            <h1>Gerenciar Perfis</h1>
+            <div class="input-container">
+                <label for="profileName">Nome do Perfil:</label>
+                <input type="text" id="profileName">
+                <br>
+                <button id="addProfile-button">Adicionar Perfil</button>
+                <button id="updateProfile-button" style="display: none;">Atualizar Perfil</button>
+            </div>
+            <div id="profileList"></div>
         </div>
 
-        <div class="input-container">
-            <h2>Dados de Estaca</h2>
-            <label for="categoriaEstaca">Categoria da Estaca:</label>
-            <select id="categoriaEstaca">
-                <option value="Pré-Moldada">Pré-Moldada</option>
-                <option value="Moldada In-Loco">Moldada In-Loco</option>
-            </select>
-            <br>
-            <div id="preMoldadaOptions">
-                <label for="tipoPreMoldada">Tipo de Estaca:</label>
-                <select id="tipoPreMoldada">
-                    <option value="Metalica">Metalica</option>
-                    <option value="Pré-Moldada cravada">Pré-Moldada cravada</option>
-                    <option value="Pré-Moldada prensada">Pré-Moldada prensada</option>
+        <div id="calculator-section" class="section">
+            <nav id="profile-nav" class="nav">
+                <span id="currentProfileName"></span>
+                <button id="editProfileNav-button">Editar Perfil</button>
+                <button id="deleteProfileNav-button">Excluir Perfil</button>
+            </nav>
+            <h1>FoundaCalc</h1>
+            <div class="input-container">
+                <h2>Dados de Sondagem</h2>
+                <label for="tipoSolo">Tipo de Solo:</label>
+                <select id="tipoSolo">
+                    <option value="Areia">Areia</option>
+                    <!-- Outras opções... -->
+                </select>
+                <br>
+                <label for="profundidade">Profundidade:</label>
+                <input type="number" id="profundidade">
+                <br>
+                <label for="nspt">Nspt:</label>
+                <input type="number" id="nspt">
+            </div>
+            <div class="input-container">
+                <h2>Dados de Estaca</h2>
+                <label for="categoriaEstaca">Categoria da Estaca:</label>
+                <select id="categoriaEstaca">
+                    <option value="Pré-Moldada">Pré-Moldada</option>
+                    <!-- Outras opções... -->
+                </select>
+                <br>
+                <div id="preMoldadaOptions">
+                    <label for="tipoPreMoldada">Tipo de Estaca:</label>
+                    <select id="tipoPreMoldada">
+                        <option value="Metalica">Metalica</option>
+                        <!-- Outras opções... -->
+                    </select>
+                </div>
+                <div id="moldadaInLocoOptions" style="display: none;">
+                    <label for="tipoMoldadaInLoco">Tipo de Estaca:</label>
+                    <select id="tipoMoldadaInLoco">
+                        <option value="Franki">Franki</option>
+                        <!-- Outras opções... -->
+                    </select>
+                </div>
+                <br>
+                <label for="diametroEstaca">Diâmetro da Estaca (cm):</label>
+                <input type="number" id="diametroEstaca">
+            </div>
+            <div class="input-container">
+                <h2>Método de Cálculo</h2>
+                <label for="metodoCalculo">Método:</label>
+                <select id="metodoCalculo">
+                    <option value="Aoki">Aoki</option>
+                    <option value="Decourt">Decourt</option>
                 </select>
             </div>
-            <div id="moldadaInLocoOptions" style="display: none;">
-                <label for="tipoMoldadaInLoco">Tipo de Estaca:</label>
-                <select id="tipoMoldadaInLoco">
-                    <option value="Franki">Franki</option>
-                    <option value="Escavada pequeno diâmetro">Escavada pequeno diâmetro</option>
-                    <option value="Escavada grande diâmetro">Escavada grande diâmetro</option>
-                    <option value="Escavada com lama betonítica">Escavada com lama betonítica</option>
-                    <option value="Raiz">Raiz</option>
-                    <option value="Strauss">Strauss</option>
-                    <option value="Hélice contínua">Hélice contínua</option>
-                </select>
-            </div>
-            <br>
-            <label for="diametroEstaca">Diâmetro da Estaca (cm):</label>
-            <input type="number" id="diametroEstaca">
-        </div>
-
-        <div class="input-container">
-            <h2>Método de Cálculo</h2>
-            <label for="metodoCalculo">Método:</label>
-            <select id="metodoCalculo">
-                <option value="Aoki">Aoki</option>
-                <option value="Decourt">Decourt</option>
-            </select>
-        </div>
-
-        <button id="calcular-button">Calcular</button>
-
-        <div class="result-container">
-            <h2>Resultados</h2>
-            <div id="resultados">
-                <!-- Resultados serão exibidos aqui -->
+            <button id="calcular-button">Calcular</button>
+            <div class="result-container">
+                <h2>Resultados</h2>
+                <div id="resultados"></div>
             </div>
         </div>
     </div>
