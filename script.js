@@ -22,8 +22,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const currentProfileName = document.getElementById('currentProfileName');
     const editProfileNavButton = document.getElementById('editProfileNav-button');
     const deleteProfileNavButton = document.getElementById('deleteProfileNav-button');
+    const viewHistoryNavButton = document.getElementById('viewHistoryNav-button');
+    const historyModal = document.getElementById('history-modal');
+    const historyList = document.getElementById('history-list');
+    const closeHistoryButton = document.querySelector('.close-button');
+
+    const viewNotesNavButton = document.getElementById('viewNotesNav-button');
+    const notesModal = document.getElementById('notes-modal');
+    const notesList = document.getElementById('notes-list');
+    const newNoteContent = document.getElementById('new-note-content');
+    const addNoteButton = document.getElementById('add-note-button');
+    const closeNotesButton = document.querySelector('.close-notes-button');
 
     let profiles = JSON.parse(localStorage.getItem('profiles')) || [];
+    let history = JSON.parse(localStorage.getItem('history')) || [];
+    let notes = JSON.parse(localStorage.getItem('notes')) || [];
     let currentProfileIndex = profiles.length > 0 ? 0 : null;
 
     const Ksolo = {
@@ -85,6 +98,22 @@ document.addEventListener('DOMContentLoaded', function () {
         const Rl = (a * ((K * nspt) / F2) * Al) / profundidade;
         const R = Rp + Rl;
 
+        const result = {
+            tipoSolo,
+            profundidade,
+            nspt,
+            categoriaEstaca,
+            tipoEstaca,
+            diametroEstaca,
+            metodo,
+            R: R.toFixed(3),
+            Rp: Rp.toFixed(3),
+            Rl: Rl.toFixed(3),
+            date: new Date().toLocaleString()
+        };
+
+        saveToHistory(result);
+
         resultadosDiv.innerHTML = `
             <p>Método utilizado: ${metodo}</p>
             <p><strong>R:</strong> ${R.toFixed(3)} Kn</p>
@@ -94,6 +123,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     calcularButton.addEventListener('click', calculateResults);
+
+    function saveToHistory(result) {
+        history.push(result);
+        localStorage.setItem('history', JSON.stringify(history));
+    }
 
     function exportResultsToPdf() {
         const { jsPDF } = window.jspdf;
@@ -211,6 +245,104 @@ document.addEventListener('DOMContentLoaded', function () {
             switchToProfilePage();
         }
     });
+
+    viewHistoryNavButton.addEventListener('click', function () {
+        renderHistory();
+        historyModal.style.display = 'block';
+    });
+
+    closeHistoryButton.addEventListener('click', function () {
+        historyModal.style.display = 'none';
+    });
+
+    function renderHistory() {
+        historyList.innerHTML = '';
+        if (history.length > 0) {
+            history.forEach((entry, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <span>Data: ${entry.date}</span>
+                    <span>Tipo de Solo: ${entry.tipoSolo}</span>
+                    <span>Profundidade: ${entry.profundidade} m</span>
+                    <span>Nspt: ${entry.nspt}</span>
+                    <span>Categoria da Estaca: ${entry.categoriaEstaca}</span>
+                    <span>Tipo de Estaca: ${entry.tipoEstaca}</span>
+                    <span>Diâmetro da Estaca: ${entry.diametroEstaca * 100} cm</span>
+                    <span>Método: ${entry.metodo}</span>
+                    <span><strong>R:</strong> ${entry.R} Kn</span>
+                    <span><strong>Rp:</strong> ${entry.Rp} Kn</span>
+                    <span><strong>Rl:</strong> ${entry.Rl} Kn</span>
+                    <button onclick="deleteHistoryEntry(${index})">Excluir</button>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        } else {
+            historyList.innerHTML = '<p>Nenhum histórico encontrado.</p>';
+        }
+    }
+
+    window.deleteHistoryEntry = function (index) {
+        history.splice(index, 1);
+        localStorage.setItem('history', JSON.stringify(history));
+        renderHistory();
+    }
+
+    viewNotesNavButton.addEventListener('click', function () {
+        renderNotes();
+        notesModal.style.display = 'block';
+    });
+
+    closeNotesButton.addEventListener('click', function () {
+        notesModal.style.display = 'none';
+    });
+
+    addNoteButton.addEventListener('click', function () {
+        const noteContent = newNoteContent.value.trim();
+        if (noteContent) {
+            notes.push({ content: noteContent, date: new Date().toLocaleString() });
+            localStorage.setItem('notes', JSON.stringify(notes));
+            newNoteContent.value = '';
+            renderNotes();
+        } else {
+            alert("Por favor, escreva alguma coisa.");
+        }
+    });
+
+    function renderNotes() {
+        notesList.innerHTML = '';
+        if (notes.length > 0) {
+            notes.forEach((note, index) => {
+                const noteItem = document.createElement('div');
+                noteItem.className = 'note-item';
+                noteItem.innerHTML = `
+                    <span>${note.date}</span>
+                    <span>${note.content}</span>
+                    <button onclick="editNoteEntry(${index})">Editar</button>
+                    <button onclick="deleteNoteEntry(${index})">Excluir</button>
+                `;
+                notesList.appendChild(noteItem);
+            });
+        } else {
+            notesList.innerHTML = '<p>Nenhuma anotação encontrada.</p>';
+        }
+    }
+
+    window.editNoteEntry = function (index) {
+        const newContent = prompt("Edite sua anotação:", notes[index].content);
+        if (newContent !== null && newContent.trim() !== "") {
+            notes[index].content = newContent.trim();
+            notes[index].date = new Date().toLocaleString();
+            localStorage.setItem('notes', JSON.stringify(notes));
+            renderNotes();
+        }
+    };
+
+    window.deleteNoteEntry = function (index) {
+        notes.splice(index, 1);
+        localStorage.setItem('notes', JSON.stringify(notes));
+        renderNotes();
+    };
 
     function switchToCalculatorPage(profileName) {
         if (profileName) {

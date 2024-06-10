@@ -12,9 +12,8 @@
     <div id="welcome-page" class="page active">
         <div class="overlay">
             <div class="container">
-                <h1>Bem-vindo a sua Calculadora de Estacas</h1>
-                <p>A ferramenta definitiva para calcular estacas de fundação. 
-                    Clique no botão abaixo para começar.</p>
+                <h1>Bem-vindo ao FoundaCalc</h1>
+                <p>Bem-vindo ao FoundaCalc, a ferramenta definitiva para calcular estacas de fundação. Clique no botão abaixo para começar.</p>
                 <button id="start-button">Iniciar</button>
             </div>
         </div>
@@ -51,6 +50,8 @@
                     <div class="dropdown-content">
                         <a href="#" id="editProfileNav-button">Editar Perfil</a>
                         <a href="#" id="deleteProfileNav-button">Excluir Perfil</a>
+                        <a href="#" id="viewHistoryNav-button">Histórico</a>
+                        <a href="#" id="viewNotesNav-button">Anotações</a>
                         <a href="#" id="toggleTheme-button">Alternar Tema</a>
                     </div>
                 </div>
@@ -129,6 +130,26 @@
                 <h2>Resultados</h2>
                 <div id="resultados"></div>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal para exibir o histórico -->
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Histórico de Cálculos</h2>
+            <div id="history-list"></div>
+        </div>
+    </div>
+
+    <!-- Modal para gerenciar anotações -->
+    <div id="notes-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-notes-button">&times;</span>
+            <h2>Anotações</h2>
+            <div id="notes-list"></div>
+            <textarea id="new-note-content" placeholder="Escreva sua anotação aqui..."></textarea>
+            <button id="add-note-button">Adicionar Anotação</button>
         </div>
     </div>
 
