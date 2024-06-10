@@ -3,65 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dimensionamento de Estacas</title>
+    <title>FoundaCalc</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Dimensionamento de Estacas</h1>
-    </header>
-    <main>
-        <!-- Seção de Cadastro -->
-        <section id="cadastro" class="ativo">
-            <h2>Cadastro de Usuário</h2>
-            <form id="form-cadastro">
-                <label for="nome">Nome:</label>
-                <input type="text" id="nome" name="nome" required>
-                
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-                
-                <label for="senha">Senha:</label>
-                <input type="password" id="senha" name="senha" required>
-                
-                <button type="button" id="cadastrar">Cadastrar</button>
-            </form>
-        </section>
+    <div class="container">
+        <h1>FoundaCalc</h1>
+        <div class="input-container">
+            <h2>Dados de Sondagem</h2>
+            <label for="tipoSolo">Tipo de Solo:</label>
+            <select id="tipoSolo">
+                <option value="Areia">Areia</option>
+                <option value="Areia siltosa">Areia siltosa</option>
+                <option value="Areia siltoargilosa">Areia siltoargilosa</option>
+                <option value="Areia Argilosa">Areia Argilosa</option>
+                <option value="Areia argilossiltosa">Areia argilossiltosa</option>
+                <option value="Silte">Silte</option>
+                <option value="Silte arenoso">Silte arenoso</option>
+                <option value="Silte arenoargiloso">Silte arenoargiloso</option>
+                <option value="Silte argiloso">Silte argiloso</option>
+                <option value="Silte argiloarenoso">Silte argiloarenoso</option>
+                <option value="Argila">Argila</option>
+                <option value="Argila arenosa">Argila arenosa</option>
+                <option value="Argila arenossiltosa">Argila arenossiltosa</option>
+                <option value="Argila siltosa">Argila siltosa</option>
+                <option value="Argila siltoarenosa">Argila siltoarenosa</option>
+            </select>
+            <br>
+            <label for="profundidade">Profundidade:</label>
+            <input type="number" id="profundidade">
+            <br>
+            <label for="nspt">Nspt:</label>
+            <input type="number" id="nspt">
+        </div>
 
-        <!-- Seção de Entrada de Dados -->
-        <section id="entrada-dados">
-            <h2>Entrada de Dados</h2>
-            <form id="form-entrada-dados">
-                <label for="tipoSolo">Tipo de Solo:</label>
-                <input type="text" id="tipoSolo" name="tipoSolo" required>
-                
-                <label for="coesao">Coesão:</label>
-                <input type="number" id="coesao" name="coesao" step="0.01" required>
-                
-                <label for="anguloAtritoInterno">Ângulo de Atrito Interno:</label>
-                <input type="number" id="anguloAtritoInterno" name="anguloAtritoInterno" step="0.1" required>
-                
-                <label for="resistenciaPenetracao">Resistência à Penetração:</label>
-                <input type="number" id="resistenciaPenetracao" name="resistenciaPenetracao" step="0.1" required>
-                
-                <label for="diametroSolo">Diâmetro do Solo:</label>
-                <input type="number" id="diametroSolo" name="diametroSolo" step="0.01" required>
-                
-                <button type="button" id="calcular">Calcular</button>
-            </form>
-        </section>
+        <div class="input-container">
+            <h2>Dados de Estaca</h2>
+            <label for="categoriaEstaca">Categoria da Estaca:</label>
+            <select id="categoriaEstaca">
+                <option value="Pré-Moldada">Pré-Moldada</option>
+                <option value="Moldada In-Loco">Moldada In-Loco</option>
+            </select>
+            <br>
+            <div id="preMoldadaOptions">
+                <label for="tipoPreMoldada">Tipo de Estaca:</label>
+                <select id="tipoPreMoldada">
+                    <option value="Metalica">Metalica</option>
+                    <option value="Pré-Moldada cravada">Pré-Moldada cravada</option>
+                    <option value="Pré-Moldada prensada">Pré-Moldada prensada</option>
+                </select>
+            </div>
+            <div id="moldadaInLocoOptions" style="display: none;">
+                <label for="tipoMoldadaInLoco">Tipo de Estaca:</label>
+                <select id="tipoMoldadaInLoco">
+                    <option value="Franki">Franki</option>
+                    <option value="Escavada pequeno diâmetro">Escavada pequeno diâmetro</option>
+                    <option value="Escavada grande diâmetro">Escavada grande diâmetro</option>
+                    <option value="Escavada com lama betonítica">Escavada com lama betonítica</option>
+                    <option value="Raiz">Raiz</option>
+                    <option value="Strauss">Strauss</option>
+                    <option value="Hélice contínua">Hélice contínua</option>
+                </select>
+            </div>
+            <br>
+            <label for="diametroEstaca">Diâmetro da Estaca (cm):</label>
+            <input type="number" id="diametroEstaca">
+        </div>
 
-        <!-- Seção de Resultados -->
-        <section id="resultados">
+        <div class="input-container">
+            <h2>Método de Cálculo</h2>
+            <label for="metodoCalculo">Método:</label>
+            <select id="metodoCalculo">
+                <option value="Aoki">Aoki</option>
+                <option value="Decourt">Decourt</option>
+            </select>
+        </div>
+
+        <button id="calcular-button">Calcular</button>
+
+        <div class="result-container">
             <h2>Resultados</h2>
-            <div id="resultados-container"></div>
-            <button type="button" id="exportar-pdf">Exportar em PDF</button>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2024 Dimensionamento de Estacas</p>
-    </footer>
+            <div id="resultados">
+                <!-- Resultados serão exibidos aqui -->
+            </div>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
