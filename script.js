@@ -226,10 +226,8 @@ document.addEventListener('DOMContentLoaded', function () {
         calculatorPage.classList.remove('active');
     }
 
-    // Render profiles on page load
     renderProfiles();
 
-    // Auto-fill if there's a profile and switch to calculator page
     if (profiles.length > 0) {
         switchToCalculatorPage(profiles[0].name);
     }
