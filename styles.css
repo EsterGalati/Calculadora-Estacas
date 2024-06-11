@@ -370,3 +370,43 @@ button.back-button {
 button.back-button:hover {
     background-color: var(--button-hover-bg-color);
 }
+
+/* Estilos para os itens de perfil */
+.profile-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.profile-item span {
+    font-size: 16px;
+}
+
+.profile-item button {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.profile-item button:hover {
+    background-color: darkred;
+}
+
+#addNewProfile-button {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#addNewProfile-button:hover {
+    background-color: var(--button-hover-bg-color);
+}

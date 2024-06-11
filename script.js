@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const toggleThemeButton = document.getElementById('toggleTheme-button');
 
     const addProfileButton = document.getElementById('addProfile-button');
+    const addNewProfileButton = document.getElementById('addNewProfile-button');
     const updateProfileButton = document.getElementById('updateProfile-button');
     const profileNameInput = document.getElementById('profileName');
     const profileEmailInput = document.getElementById('profileEmail');
@@ -41,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let profiles = JSON.parse(localStorage.getItem('profiles')) || [];
     let history = JSON.parse(localStorage.getItem('history')) || [];
     let notes = JSON.parse(localStorage.getItem('notes')) || [];
-    let currentProfileIndex = profiles.length > 0 ? 0 : null;
+    let currentProfileIndex = null;
 
     const Ksolo = {
         "Areia": 1000, "Areia siltosa": 800, "Areia siltoargilosa": 700, "Areia Argilosa": 600,
@@ -113,7 +114,8 @@ document.addEventListener('DOMContentLoaded', function () {
             R: R.toFixed(3),
             Rp: Rp.toFixed(3),
             Rl: Rl.toFixed(3),
-            date: new Date().toLocaleString()
+            date: new Date().toLocaleString(),
+            profileName: currentProfileName.textContent
         };
 
         saveToHistory(result);
@@ -162,6 +164,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div>
                         <button onclick="editProfile(${index})">Editar</button>
                         <button onclick="deleteProfile(${index})">Excluir</button>
+                        <button onclick="switchProfile(${index})">Selecionar</button>
                     </div>
                 `;
                 profileList.appendChild(profileItem);
@@ -205,6 +208,13 @@ document.addEventListener('DOMContentLoaded', function () {
         switchToProfilePage();
     }
 
+    window.switchProfile = function (index) {
+        currentProfileIndex = index;
+        const profile = profiles[index];
+        currentProfileName.textContent = profile.name;
+        switchToCalculatorPage(profile.name);
+    }
+
     addProfileButton.addEventListener('click', function () {
         const profileName = profileNameInput.value.trim();
         const profileEmail = profileEmailInput.value.trim();
@@ -237,6 +247,15 @@ document.addEventListener('DOMContentLoaded', function () {
             renderProfiles();
             switchToCalculatorPage(profileName);
         }
+    });
+
+    addNewProfileButton.addEventListener('click', function () {
+        inputContainer.style.display = 'block';
+        updateProfileButton.style.display = 'none';
+        addProfileButton.style.display = 'inline-block';
+        profileNameInput.value = '';
+        profileEmailInput.value = '';
+        profilePhoneInput.value = '';
     });
 
     editProfileNavButton.addEventListener('click', function () {
@@ -286,8 +305,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renderHistory() {
         historyList.innerHTML = '';
-        if (history.length > 0) {
-            history.forEach((entry, index) => {
+        const currentProfileHistory = history.filter(entry => entry.profileName === currentProfileName.textContent);
+        if (currentProfileHistory.length > 0) {
+            currentProfileHistory.forEach((entry, index) => {
                 const historyItem = document.createElement('div');
                 historyItem.className = 'history-item';
                 historyItem.innerHTML = `
