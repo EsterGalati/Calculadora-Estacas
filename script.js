@@ -201,11 +201,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const profile = profiles[index];
         const profileName = profile.name;
         
-        // Remove profile
         profiles.splice(index, 1);
         localStorage.setItem('profiles', JSON.stringify(profiles));
         
-        // Remove associated history and notes
         history = history.filter(entry => entry.profileName !== profileName);
         localStorage.setItem('history', JSON.stringify(history));
         
@@ -288,11 +286,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (currentProfileIndex !== -1) {
             const profileName = profiles[currentProfileIndex].name;
 
-            // Remove profile
             profiles.splice(currentProfileIndex, 1);
             localStorage.setItem('profiles', JSON.stringify(profiles));
 
-            // Remove associated history and notes
             history = history.filter(entry => entry.profileName !== profileName);
             localStorage.setItem('history', JSON.stringify(history));
 
@@ -420,7 +416,7 @@ document.addEventListener('DOMContentLoaded', function () {
         profilePage.classList.remove('active');
         calculatorPage.classList.add('active');
         backToCalculatorButtonProfile.style.display = 'none';
-        addNewProfileButton.style.display = 'none'; // Esconde o botão de adicionar novo perfil ao voltar para a página da calculadora
+        addNewProfileButton.style.display = 'none'; 
     }
 
     function switchToProfilePage() {
@@ -450,7 +446,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Event listeners for back buttons
     backToCalculatorButtonProfile.addEventListener('click', function() {
         switchToCalculatorPage(currentProfileName.textContent);
     });
@@ -465,17 +460,14 @@ document.addEventListener('DOMContentLoaded', function () {
         switchToCalculatorPage(currentProfileName.textContent);
     });
 
-    // Render profiles on page load
     renderProfiles();
 
-    // Auto-fill if there's a profile and switch to calculator page
     if (profiles.length > 0) {
         switchToCalculatorPage(profiles[0].name);
     } else {
         addProfileButton.style.display = 'inline-block';
     }
 
-    // Theme toggle functionality
     function toggleTheme() {
         document.body.classList.toggle('dark-theme');
         if (document.body.classList.contains('dark-theme')) {
@@ -485,7 +477,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Load theme from localStorage
     function loadTheme() {
         const theme = localStorage.getItem('theme');
         if (theme === 'dark') {
@@ -497,7 +488,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     toggleThemeButton.addEventListener('click', toggleTheme);
 
-    // Load theme on page load
     loadTheme();
 });
 
