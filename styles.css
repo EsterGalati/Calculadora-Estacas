@@ -12,7 +12,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(52, 46, 46, 0.6); /* Plano de fundo com opacidade */
+    background-color: rgba(52, 46, 46, 0.6); 
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -22,7 +22,7 @@
 #welcome-page .container {
     position: relative;
     z-index: 1;
-    background-color: rgba(255, 255, 255, 0.9); /* Container com opacidade */
+    background-color: rgba(255, 255, 255, 0.9); 
     padding: 20px;
     border-radius: 10px;
     text-align: center;
@@ -41,8 +41,8 @@
 #welcome-page button {
     width: auto;
     padding: 10px 20px;
-    margin-top: auto; /* Empurra o botão para a parte inferior */
-    margin-bottom: 40px; /* Espaço abaixo do botão */
+    margin-top: auto; 
+    margin-bottom: 40px; 
     border-radius: 5px;
     border: none;
     background-color: var(--button-bg-color);
@@ -55,7 +55,6 @@
     background-color: var(--button-hover-bg-color);
 }
 
-/* Estilos para o modal de histórico e notas */
 .modal {
     display: none;
     position: fixed;
@@ -189,9 +188,9 @@ body, html {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin: 20px;
-    padding-top: 80px; /* Espaço para a barra de navegação fixa */
-    overflow-y: auto; /* Garantir que o conteúdo interno seja rolável se necessário */
-    height: calc(100vh - 40px); /* Ajuste de altura para se adaptar à tela */
+    padding-top: 80px; 
+    overflow-y: auto; 
+    height: calc(100vh - 40px); 
 }
 
 .input-container {
@@ -214,8 +213,8 @@ input, select {
     border-radius: 5px;
     border: 1px solid #ccc;
     box-sizing: border-box;
-    background-color: var(--container-bg-color); /* Ajustar a cor de fundo dos inputs */
-    color: var(--text-color); /* Ajustar a cor do texto dos inputs */
+    background-color: var(--container-bg-color); 
+    color: var(--text-color); 
 }
 
 button {
@@ -243,7 +242,7 @@ button:hover {
 }
 
 #resultados {
-    background-color: var(--container-bg-color); /* Ajustar a cor de fundo dos resultados */
+    background-color: var(--container-bg-color); 
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ddd;
@@ -257,7 +256,6 @@ button:hover {
     display: block;
 }
 
-/* Estilos para a barra de navegação */
 .nav {
     display: flex;
     justify-content: space-between;
@@ -287,7 +285,6 @@ button:hover {
     background-color: var(--button-hover-bg-color);
 }
 
-/* Dropdown menu */
 .dropdown {
     position: relative;
     display: inline-block;
@@ -333,12 +330,11 @@ button:hover {
     background-color: var(--button-hover-bg-color);
 }
 
-/* Responsividade */
 @media (max-width: 600px) {
     .container {
         padding: 10px;
-        padding-top: 80px; /* Espaço para a barra de navegação fixa */
-        height: calc(100vh - 20px); /* Ajuste de altura para se adaptar à tela */
+        padding-top: 80px; 
+        height: calc(100vh - 20px); 
     }
     
     input, select, button {
@@ -361,17 +357,16 @@ button.back-button {
     color: var(--button-text-color);
     border: none;
     padding: 10px;
-    margin-top: 20px; /* Espaço acima do botão */
+    margin-top: 20px; 
     cursor: pointer;
     border-radius: 5px;
-    width: 100%; /* Para ocupar toda a largura do contêiner */
+    width: 100%; 
 }
 
 button.back-button:hover {
     background-color: var(--button-hover-bg-color);
 }
 
-/* Estilos para os itens de perfil */
 .profile-item {
     display: flex;
     justify-content: space-between;
