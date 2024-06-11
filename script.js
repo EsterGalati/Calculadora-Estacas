@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const toggleThemeButton = document.getElementById('toggleTheme-button');
 
     const addProfileButton = document.getElementById('addProfile-button');
-    const addNewProfileButton = document.getElementById('addNewProfile-button');
     const updateProfileButton = document.getElementById('updateProfile-button');
     const profileNameInput = document.getElementById('profileName');
     const profileEmailInput = document.getElementById('profileEmail');
@@ -38,6 +37,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const newNoteContent = document.getElementById('new-note-content');
     const addNoteButton = document.getElementById('add-note-button');
     const closeNotesButton = document.querySelector('.close-notes-button');
+
+    // Adiciona o botão "Adicionar Novo Perfil" dinamicamente
+    const addNewProfileButton = document.createElement('button');
+    addNewProfileButton.id = 'addNewProfile-button';
+    addNewProfileButton.innerText = 'Adicionar Novo Perfil';
+    addNewProfileButton.style.display = 'none'; // Escondido por padrão
+
+    inputContainer.appendChild(addNewProfileButton);
 
     let profiles = JSON.parse(localStorage.getItem('profiles')) || [];
     let history = JSON.parse(localStorage.getItem('history')) || [];
@@ -183,6 +190,7 @@ document.addEventListener('DOMContentLoaded', function () {
         profilePhoneInput.value = profile.phone;
         addProfileButton.style.display = 'none';
         updateProfileButton.style.display = 'inline-block';
+        addNewProfileButton.style.display = 'inline-block';
         inputContainer.style.display = 'block';
         profilePage.classList.add('active');
         calculatorPage.classList.remove('active');
@@ -244,6 +252,7 @@ document.addEventListener('DOMContentLoaded', function () {
             profilePhoneInput.value = '';
             currentProfileIndex = null;
             updateProfileButton.style.display = 'none';
+            addNewProfileButton.style.display = 'none';
             renderProfiles();
             switchToCalculatorPage(profileName);
         }
@@ -267,6 +276,7 @@ document.addEventListener('DOMContentLoaded', function () {
             profilePhoneInput.value = profile.phone;
             updateProfileButton.style.display = 'inline-block';
             addProfileButton.style.display = 'none';
+            addNewProfileButton.style.display = 'inline-block';
             inputContainer.style.display = 'block';
             switchToProfilePage();
             backToCalculatorButtonProfile.style.display = 'inline-block';
@@ -410,6 +420,7 @@ document.addEventListener('DOMContentLoaded', function () {
         profilePage.classList.remove('active');
         calculatorPage.classList.add('active');
         backToCalculatorButtonProfile.style.display = 'none';
+        addNewProfileButton.style.display = 'none'; // Esconde o botão de adicionar novo perfil ao voltar para a página da calculadora
     }
 
     function switchToProfilePage() {
@@ -424,6 +435,7 @@ document.addEventListener('DOMContentLoaded', function () {
             addProfileButton.style.display = 'none';
         }
         updateProfileButton.style.display = 'none';
+        addNewProfileButton.style.display = 'none';
         welcomePage.classList.remove('active');
         profilePage.classList.add('active');
         calculatorPage.classList.remove('active');
@@ -488,3 +500,5 @@ document.addEventListener('DOMContentLoaded', function () {
     // Load theme on page load
     loadTheme();
 });
+
+
