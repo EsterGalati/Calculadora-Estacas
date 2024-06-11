@@ -18,28 +18,27 @@
             </div>
         </div>
     </div>
-
-    <!-- Página do Perfil -->
-    <div id="profile-page" class="page">
-        <div class="container">
-            <h1>Perfil</h1>
-            <div id="input-container" class="input-container" style="display: none;">
-                <label for="profileName">Nome do Perfil:</label>
-                <input type="text" id="profileName">
-                <br>
-                <label for="profileEmail">E-mail:</label>
-                <input type="email" id="profileEmail">
-                <br>
-                <label for="profilePhone">Telefone:</label>
-                <input type="tel" id="profilePhone">
-                <br>
-                <button id="addProfile-button" style="display: none;">Adicionar Perfil</button>
-                <button id="updateProfile-button" style="display: none;">Atualizar Perfil</button>
-            </div>
-            <div id="profileList"></div>
+<!-- Página do Perfil -->
+<div id="profile-page" class="page">
+    <div class="container">
+        <h1>Perfil</h1>
+        <div id="input-container" class="input-container" style="display: none;">
+            <label for="profileName">Nome do Perfil:</label>
+            <input type="text" id="profileName">
+            <br>
+            <label for="profileEmail">E-mail:</label>
+            <input type="email" id="profileEmail">
+            <br>
+            <label for="profilePhone">Telefone:</label>
+            <input type="tel" id="profilePhone">
+            <br>
+            <button id="addProfile-button" style="display: none;">Adicionar Perfil</button>
+            <button id="updateProfile-button" style="display: none;">Atualizar Perfil</button>
         </div>
+        <div id="profileList"></div>
+        <button id="back-to-calculator-button-profile" class="back-button" style="display: none;">Voltar</button>
     </div>
-
+</div>
     <!-- Página do Calculadora -->
     <div id="calculator-page" class="page">
         <div class="container">
@@ -133,25 +132,27 @@
         </div>
     </div>
 
-    <!-- Histórico -->
-    <div id="history-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>Histórico de Cálculos</h2>
-            <div id="history-list"></div>
-        </div>
+<!-- Histórico -->
+<div id="history-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Histórico de Cálculos</h2>
+        <div id="history-list"></div>
+        <button id="back-to-calculator-button-history" class="back-button">Voltar</button>
     </div>
+</div>
 
-    <!-- Gerenciar anotações -->
-    <div id="notes-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-notes-button">&times;</span>
-            <h2>Anotações</h2>
-            <div id="notes-list"></div>
-            <textarea id="new-note-content" placeholder="Escreva sua anotação aqui..."></textarea>
-            <button id="add-note-button">Adicionar Anotação</button>
-        </div>
+<!-- Gerenciar anotações -->
+<div id="notes-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-notes-button">&times;</span>
+        <h2>Anotações</h2>
+        <div id="notes-list"></div>
+        <textarea id="new-note-content" placeholder="Escreva sua anotação aqui..."></textarea>
+        <button id="add-note-button">Adicionar Anotação</button>
+        <button id="back-to-calculator-button-notes" class="back-button">Voltar</button>
     </div>
+</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="script.js"></script>

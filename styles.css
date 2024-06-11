@@ -356,3 +356,17 @@ button:hover {
         min-width: 120px;
     }
 }
+button.back-button {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    padding: 10px;
+    margin-top: 20px; /* Espaço acima do botão */
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100%; /* Para ocupar toda a largura do contêiner */
+}
+
+button.back-button:hover {
+    background-color: var(--button-hover-bg-color);
+}

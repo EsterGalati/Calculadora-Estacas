@@ -3,6 +3,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const welcomePage = document.getElementById('welcome-page');
     const profilePage = document.getElementById('profile-page');
     const calculatorPage = document.getElementById('calculator-page');
+    const historyModal = document.getElementById('history-modal');
+    const notesModal = document.getElementById('notes-modal');
+    const backToCalculatorButtonProfile = document.getElementById('back-to-calculator-button-profile');
+    const backToCalculatorButtonHistory = document.getElementById('back-to-calculator-button-history');
+    const backToCalculatorButtonNotes = document.getElementById('back-to-calculator-button-notes');
+
     const categoriaEstaca = document.getElementById('categoriaEstaca');
     const preMoldadaOptions = document.getElementById('preMoldadaOptions');
     const moldadaInLocoOptions = document.getElementById('moldadaInLocoOptions');
@@ -23,12 +29,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const editProfileNavButton = document.getElementById('editProfileNav-button');
     const deleteProfileNavButton = document.getElementById('deleteProfileNav-button');
     const viewHistoryNavButton = document.getElementById('viewHistoryNav-button');
-    const historyModal = document.getElementById('history-modal');
     const historyList = document.getElementById('history-list');
     const closeHistoryButton = document.querySelector('.close-button');
 
     const viewNotesNavButton = document.getElementById('viewNotesNav-button');
-    const notesModal = document.getElementById('notes-modal');
     const notesList = document.getElementById('notes-list');
     const newNoteContent = document.getElementById('new-note-content');
     const addNoteButton = document.getElementById('add-note-button');
@@ -179,11 +183,24 @@ document.addEventListener('DOMContentLoaded', function () {
         inputContainer.style.display = 'block';
         profilePage.classList.add('active');
         calculatorPage.classList.remove('active');
+        backToCalculatorButtonProfile.style.display = 'inline-block';
     }
 
     window.deleteProfile = function (index) {
+        const profile = profiles[index];
+        const profileName = profile.name;
+        
+        // Remove profile
         profiles.splice(index, 1);
         localStorage.setItem('profiles', JSON.stringify(profiles));
+        
+        // Remove associated history and notes
+        history = history.filter(entry => entry.profileName !== profileName);
+        localStorage.setItem('history', JSON.stringify(history));
+        
+        notes = notes.filter(note => note.profileName !== profileName);
+        localStorage.setItem('notes', JSON.stringify(notes));
+        
         renderProfiles();
         switchToProfilePage();
     }
@@ -193,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const profileEmail = profileEmailInput.value.trim();
         const profilePhone = profilePhoneInput.value.trim();
         if (profileName && profileEmail && profilePhone) {
-            profiles = [{ name: profileName, email: profileEmail, phone: profilePhone }];
+            profiles.push({ name: profileName, email: profileEmail, phone: profilePhone });
             localStorage.setItem('profiles', JSON.stringify(profiles));
             profileNameInput.value = '';
             profileEmailInput.value = '';
@@ -233,14 +250,26 @@ document.addEventListener('DOMContentLoaded', function () {
             addProfileButton.style.display = 'none';
             inputContainer.style.display = 'block';
             switchToProfilePage();
+            backToCalculatorButtonProfile.style.display = 'inline-block';
         }
     });
 
     deleteProfileNavButton.addEventListener('click', function () {
         currentProfileIndex = profiles.findIndex(profile => profile.name === currentProfileName.textContent);
         if (currentProfileIndex !== -1) {
+            const profileName = profiles[currentProfileIndex].name;
+
+            // Remove profile
             profiles.splice(currentProfileIndex, 1);
             localStorage.setItem('profiles', JSON.stringify(profiles));
+
+            // Remove associated history and notes
+            history = history.filter(entry => entry.profileName !== profileName);
+            localStorage.setItem('history', JSON.stringify(history));
+
+            notes = notes.filter(note => note.profileName !== profileName);
+            localStorage.setItem('notes', JSON.stringify(notes));
+
             renderProfiles();
             switchToProfilePage();
         }
@@ -300,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function () {
     addNoteButton.addEventListener('click', function () {
         const noteContent = newNoteContent.value.trim();
         if (noteContent) {
-            notes.push({ content: noteContent, date: new Date().toLocaleString() });
+            notes.push({ content: noteContent, date: new Date().toLocaleString(), profileName: currentProfileName.textContent });
             localStorage.setItem('notes', JSON.stringify(notes));
             newNoteContent.value = '';
             renderNotes();
@@ -311,8 +340,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renderNotes() {
         notesList.innerHTML = '';
-        if (notes.length > 0) {
-            notes.forEach((note, index) => {
+        const currentProfileNotes = notes.filter(note => note.profileName === currentProfileName.textContent);
+        if (currentProfileNotes.length > 0) {
+            currentProfileNotes.forEach((note, index) => {
                 const noteItem = document.createElement('div');
                 noteItem.className = 'note-item';
                 noteItem.innerHTML = `
@@ -329,17 +359,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     window.editNoteEntry = function (index) {
-        const newContent = prompt("Edite sua anotação:", notes[index].content);
+        const noteIndex = notes.findIndex(note => note.profileName === currentProfileName.textContent && note.content === notes[index].content);
+        const newContent = prompt("Edite sua anotação:", notes[noteIndex].content);
         if (newContent !== null && newContent.trim() !== "") {
-            notes[index].content = newContent.trim();
-            notes[index].date = new Date().toLocaleString();
+            notes[noteIndex].content = newContent.trim();
+            notes[noteIndex].date = new Date().toLocaleString();
             localStorage.setItem('notes', JSON.stringify(notes));
             renderNotes();
         }
     };
 
     window.deleteNoteEntry = function (index) {
-        notes.splice(index, 1);
+        const noteIndex = notes.findIndex(note => note.profileName === currentProfileName.textContent && note.content === notes[index].content);
+        notes.splice(noteIndex, 1);
         localStorage.setItem('notes', JSON.stringify(notes));
         renderNotes();
     };
@@ -357,6 +389,7 @@ document.addEventListener('DOMContentLoaded', function () {
         welcomePage.classList.remove('active');
         profilePage.classList.remove('active');
         calculatorPage.classList.add('active');
+        backToCalculatorButtonProfile.style.display = 'none';
     }
 
     function switchToProfilePage() {
@@ -374,6 +407,7 @@ document.addEventListener('DOMContentLoaded', function () {
         welcomePage.classList.remove('active');
         profilePage.classList.add('active');
         calculatorPage.classList.remove('active');
+        backToCalculatorButtonProfile.style.display = 'none';
     }
 
     startButton.addEventListener('click', function() {
@@ -382,6 +416,21 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             switchToProfilePage();
         }
+    });
+
+    // Event listeners for back buttons
+    backToCalculatorButtonProfile.addEventListener('click', function() {
+        switchToCalculatorPage(currentProfileName.textContent);
+    });
+
+    backToCalculatorButtonHistory.addEventListener('click', function() {
+        historyModal.style.display = 'none';
+        switchToCalculatorPage(currentProfileName.textContent);
+    });
+
+    backToCalculatorButtonNotes.addEventListener('click', function() {
+        notesModal.style.display = 'none';
+        switchToCalculatorPage(currentProfileName.textContent);
     });
 
     // Render profiles on page load
