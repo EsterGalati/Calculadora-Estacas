@@ -6,7 +6,7 @@ const cors = require('cors');
 const app = express();
 
 app.use(bodyParser.json());
-app.use(cors());  // Adiciona o middleware CORS
+app.use(cors());
 
 const dbConfig = {
     host: 'localhost',
@@ -44,6 +44,11 @@ app.post('/api/usuarios', asyncHandler(async (req, res) => {
     res.send({ message: 'Usuário criado com sucesso!', userId: result.insertId });
 }));
 
+app.get('/api/usuarios', asyncHandler(async (req, res) => {
+    const [result] = await db.execute('SELECT * FROM usuarios');
+    res.send(result);
+}));
+
 app.get('/api/usuarios/:id', asyncHandler(async (req, res) => {
     const userId = req.params.id;
     const [result] = await db.execute('SELECT * FROM usuarios WHERE id = ?', [userId]);
@@ -77,6 +82,13 @@ app.get('/api/historico/:userId', asyncHandler(async (req, res) => {
     res.send(result);
 }));
 
+app.put('/api/historico/:id', asyncHandler(async (req, res) => {
+    const id = req.params.id;
+    const { tipoSolo, profundidade, nspt, categoriaEstaca, tipoEstaca, diametroEstaca, metodo, R, Rp, Rl } = req.body;
+    await db.execute('UPDATE historico SET tipoSolo = ?, profundidade = ?, nspt = ?, categoriaEstaca = ?, tipoEstaca = ?, diametroEstaca = ?, metodo = ?, R = ?, Rp = ?, Rl = ? WHERE id = ?', [tipoSolo, profundidade, nspt, categoriaEstaca, tipoEstaca, diametroEstaca, metodo, R, Rp, Rl, id]);
+    res.send('Histórico atualizado com sucesso!');
+}));
+
 app.delete('/api/historico/:id', asyncHandler(async (req, res) => {
     const id = req.params.id;
     await db.execute('DELETE FROM historico WHERE id = ?', [id]);
@@ -95,6 +107,13 @@ app.get('/api/anotacoes/:userId', asyncHandler(async (req, res) => {
     const userId = req.params.userId;
     const [result] = await db.execute('SELECT * FROM anotacoes WHERE user_id = ?', [userId]);
     res.send(result);
+}));
+
+app.put('/api/anotacoes/:id', asyncHandler(async (req, res) => {
+    const id = req.params.id;
+    const { content } = req.body;
+    await db.execute('UPDATE anotacoes SET content = ?, date = ? WHERE id = ?', [content, new Date(), id]);
+    res.send('Anotação atualizada com sucesso!');
 }));
 
 app.delete('/api/anotacoes/:id', asyncHandler(async (req, res) => {

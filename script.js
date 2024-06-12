@@ -47,8 +47,6 @@ document.addEventListener('DOMContentLoaded', function () {
     inputContainer.appendChild(addNewProfileButton);
 
     let profiles = [];
-    let history = [];
-    let notes = [];
     let currentProfileIndex = null;
 
     const Ksolo = {
@@ -109,51 +107,36 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 3000);
     }
 
-    async function loadProfiles() {
+    async function fetchProfiles() {
         try {
             const response = await fetch('http://localhost:3000/api/usuarios');
-            if (response.ok) {
-                profiles = await response.json();
-                localStorage.setItem('profiles', JSON.stringify(profiles));
-                renderProfiles();
-            } else {
-                showFeedback("Erro ao carregar perfis do servidor.", "error");
-            }
+            profiles = await response.json();
+            renderProfiles();
         } catch (error) {
             console.error('Erro:', error);
-            showFeedback("Erro ao conectar ao servidor.", "error");
+            showFeedback("Erro ao carregar perfis.", "error");
         }
     }
 
-    async function loadHistory() {
+    async function fetchHistory(userId) {
         try {
-            const response = await fetch('http://localhost:3000/api/historico');
-            if (response.ok) {
-                history = await response.json();
-                localStorage.setItem('history', JSON.stringify(history));
-                renderHistory();
-            } else {
-                showFeedback("Erro ao carregar histórico do servidor.", "error");
-            }
+            const response = await fetch(`http://localhost:3000/api/historico/${userId}`);
+            const history = await response.json();
+            renderHistory(history);
         } catch (error) {
             console.error('Erro:', error);
-            showFeedback("Erro ao conectar ao servidor.", "error");
+            showFeedback("Erro ao carregar histórico.", "error");
         }
     }
 
-    async function loadNotes() {
+    async function fetchNotes(userId) {
         try {
-            const response = await fetch('http://localhost:3000/api/anotacoes');
-            if (response.ok) {
-                notes = await response.json();
-                localStorage.setItem('notes', JSON.stringify(notes));
-                renderNotes();
-            } else {
-                showFeedback("Erro ao carregar anotações do servidor.", "error");
-            }
+            const response = await fetch(`http://localhost:3000/api/anotacoes/${userId}`);
+            const notes = await response.json();
+            renderNotes(notes);
         } catch (error) {
             console.error('Erro:', error);
-            showFeedback("Erro ao conectar ao servidor.", "error");
+            showFeedback("Erro ao carregar anotações.", "error");
         }
     }
 
@@ -197,8 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
             R: R.toFixed(3),
             Rp: Rp.toFixed(3),
             Rl: Rl.toFixed(3),
-            date: new Date().toLocaleString(),
-            profileName: currentProfileName.textContent
+            date: new Date().toLocaleString()
         };
 
         await saveToHistory(result);
@@ -212,9 +194,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     async function saveToHistory(result) {
-        history.push(result);
-        localStorage.setItem('history', JSON.stringify(history));
-
         try {
             const response = await fetch('http://localhost:3000/api/historico', {
                 method: 'POST',
@@ -226,6 +205,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (response.ok) {
                 showFeedback("Histórico salvo com sucesso!", "success");
+                fetchHistory(result.userId); // Recarregar o histórico
             } else {
                 showFeedback("Erro ao salvar histórico no servidor.", "error");
             }
@@ -241,10 +221,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const noteContent = newNoteContent.value.trim();
         if (noteContent) {
             const note = { userId: profiles[currentProfileIndex].id, content: noteContent, date: new Date().toLocaleString() };
-            notes.push(note);
-            localStorage.setItem('notes', JSON.stringify(notes));
-            newNoteContent.value = '';
-            renderNotes();
 
             try {
                 const response = await fetch('http://localhost:3000/api/anotacoes', {
@@ -256,6 +232,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
                 if (response.ok) {
+                    newNoteContent.value = '';
+                    fetchNotes(note.userId); // Recarregar as notas
                     showFeedback("Anotação salva com sucesso!", "success");
                 } else {
                     showFeedback("Erro ao salvar anotação no servidor.", "error");
@@ -286,13 +264,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
                 if (response.ok) {
-                    const result = await response.json();
-                    profiles.push({ ...profile, id: result.userId });
-                    localStorage.setItem('profiles', JSON.stringify(profiles));
                     profileNameInput.value = '';
                     profileEmailInput.value = '';
                     profilePhoneInput.value = '';
-                    renderProfiles();
+                    fetchProfiles(); // Recarregar os perfis
                     switchToCalculatorPage(profileName);
                     showFeedback("Perfil adicionado com sucesso!", "success");
                 } else {
@@ -327,7 +302,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     exportPdfButton.addEventListener('click', exportResultsToPdf);
 
-    function renderProfiles() {
+    async function renderProfiles() {
         profileList.innerHTML = '';
         if (profiles.length > 0) {
             profiles.forEach((profile, index) => {
@@ -367,25 +342,14 @@ document.addEventListener('DOMContentLoaded', function () {
     window.deleteProfile = async function (index) {
         const profile = profiles[index];
         const profileId = profile.id;
-        const profileName = profile.name;
 
-        // Remover do localStorage
-        profiles.splice(index, 1);
-        localStorage.setItem('profiles', JSON.stringify(profiles));
-
-        // Remover do banco de dados
         try {
             const response = await fetch(`http://localhost:3000/api/usuarios/${profileId}`, {
                 method: 'DELETE'
             });
 
             if (response.ok) {
-                history = history.filter(entry => entry.profileName !== profileName);
-                localStorage.setItem('history', JSON.stringify(history));
-                notes = notes.filter(note => note.profileName !== profileName);
-                localStorage.setItem('notes', JSON.stringify(notes));
-                renderProfiles();
-                switchToProfilePage();
+                fetchProfiles(); // Recarregar os perfis
                 showFeedback("Perfil excluído com sucesso!", "success");
             } else {
                 showFeedback("Erro ao excluir perfil no servidor.", "error");
@@ -411,24 +375,26 @@ document.addEventListener('DOMContentLoaded', function () {
         const profileName = profileNameInput.value.trim();
         const profileEmail = profileEmailInput.value.trim();
         const profilePhone = profilePhoneInput.value.trim();
-        const profileId = profiles[currentProfileIndex].id;
         if (profileName && profileEmail && profilePhone && currentProfileIndex !== null) {
-            profiles[currentProfileIndex] = { id: profileId, name: profileName, email: profileEmail, phone: profilePhone };
-            localStorage.setItem('profiles', JSON.stringify(profiles));
+            const profile = profiles[currentProfileIndex];
+            const updatedProfile = { ...profile, name: profileName, email: profileEmail, phone: profilePhone };
 
             try {
-                const response = await fetch(`http://localhost:3000/api/usuarios/${profileId}`, {
+                const response = await fetch(`http://localhost:3000/api/usuarios/${profile.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ name: profileName, email: profileEmail, phone: profilePhone })
+                    body: JSON.stringify(updatedProfile)
                 });
 
                 if (response.ok) {
+                    profileNameInput.value = '';
+                    profileEmailInput.value = '';
+                    profilePhoneInput.value = '';
+                    currentProfileIndex = null;
+                    fetchProfiles(); // Recarregar os perfis
                     showFeedback("Perfil atualizado com sucesso!", "success");
-                    renderProfiles();
-                    switchToCalculatorPage(profileName);
                 } else {
                     showFeedback("Erro ao atualizar perfil.", "error");
                 }
@@ -464,39 +430,48 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    deleteProfileNavButton.addEventListener('click', function () {
+    deleteProfileNavButton.addEventListener('click', async function () {
         currentProfileIndex = profiles.findIndex(profile => profile.name === currentProfileName.textContent);
         if (currentProfileIndex !== -1) {
-            const profileName = profiles[currentProfileIndex].name;
+            const profile = profiles[currentProfileIndex];
+            const profileId = profile.id;
 
-            profiles.splice(currentProfileIndex, 1);
-            localStorage.setItem('profiles', JSON.stringify(profiles));
+            try {
+                const response = await fetch(`http://localhost:3000/api/usuarios/${profileId}`, {
+                    method: 'DELETE'
+                });
 
-            history = history.filter(entry => entry.profileName !== profileName);
-            localStorage.setItem('history', JSON.stringify(history));
-
-            notes = notes.filter(note => note.profileName !== profileName);
-            localStorage.setItem('notes', JSON.stringify(notes));
-
-            renderProfiles();
-            switchToProfilePage();
+                if (response.ok) {
+                    fetchProfiles(); // Recarregar os perfis
+                    showFeedback("Perfil excluído com sucesso!", "success");
+                } else {
+                    showFeedback("Erro ao excluir perfil no servidor.", "error");
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showFeedback("Erro ao conectar ao servidor.", "error");
+            }
         }
     });
 
     viewHistoryNavButton.addEventListener('click', function () {
-        renderHistory();
-        historyModal.style.display = 'block';
+        const currentProfile = profiles[currentProfileIndex];
+        if (currentProfile) {
+            fetchHistory(currentProfile.id);
+            historyModal.style.display = 'block';
+        } else {
+            showFeedback("Nenhum perfil selecionado.", "error");
+        }
     });
 
     closeHistoryButton.addEventListener('click', function () {
         historyModal.style.display = 'none';
     });
 
-    function renderHistory() {
+    function renderHistory(history) {
         historyList.innerHTML = '';
-        const currentProfileHistory = history.filter(entry => entry.profileName === currentProfileName.textContent);
-        if (currentProfileHistory.length > 0) {
-            currentProfileHistory.forEach((entry, index) => {
+        if (history.length > 0) {
+            history.forEach((entry, index) => {
                 const historyItem = document.createElement('div');
                 historyItem.className = 'history-item';
                 historyItem.innerHTML = `
@@ -511,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <span><strong>R:</strong> ${entry.R} Kn</span>
                     <span><strong>Rp:</strong> ${entry.Rp} Kn</span>
                     <span><strong>Rl:</strong> ${entry.Rl} Kn</span>
-                    <button onclick="deleteHistoryEntry(${index})">Excluir</button>
+                    <button onclick="deleteHistoryEntry(${index}, ${entry.id})">Excluir</button>
                 `;
                 historyList.appendChild(historyItem);
             });
@@ -520,23 +495,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    window.deleteHistoryEntry = async function (index) {
-        const entry = history[index];
-        const entryId = entry.id;
-
-        // Remover do localStorage
-        history.splice(index, 1);
-        localStorage.setItem('history', JSON.stringify(history));
-
-        // Remover do banco de dados
+    window.deleteHistoryEntry = async function (index, entryId) {
         try {
             const response = await fetch(`http://localhost:3000/api/historico/${entryId}`, {
                 method: 'DELETE'
             });
 
             if (response.ok) {
-                renderHistory();
-                showFeedback("Histórico excluído com sucesso!", "success");
+                const currentProfile = profiles[currentProfileIndex];
+                if (currentProfile) {
+                    fetchHistory(currentProfile.id); // Recarregar o histórico
+                    showFeedback("Histórico excluído com sucesso!", "success");
+                }
             } else {
                 showFeedback("Erro ao excluir histórico no servidor.", "error");
             }
@@ -547,26 +517,30 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     viewNotesNavButton.addEventListener('click', function () {
-        renderNotes();
-        notesModal.style.display = 'block';
+        const currentProfile = profiles[currentProfileIndex];
+        if (currentProfile) {
+            fetchNotes(currentProfile.id);
+            notesModal.style.display = 'block';
+        } else {
+            showFeedback("Nenhum perfil selecionado.", "error");
+        }
     });
 
     closeNotesButton.addEventListener('click', function () {
         notesModal.style.display = 'none';
     });
 
-    function renderNotes() {
+    function renderNotes(notes) {
         notesList.innerHTML = '';
-        const currentProfileNotes = notes.filter(note => note.profileName === currentProfileName.textContent);
-        if (currentProfileNotes.length > 0) {
-            currentProfileNotes.forEach((note, index) => {
+        if (notes.length > 0) {
+            notes.forEach((note, index) => {
                 const noteItem = document.createElement('div');
                 noteItem.className = 'note-item';
                 noteItem.innerHTML = `
                     <span>${note.date}</span>
                     <span>${note.content}</span>
-                    <button onclick="editNoteEntry(${index})">Editar</button>
-                    <button onclick="deleteNoteEntry(${index})">Excluir</button>
+                    <button onclick="editNoteEntry(${index}, ${note.id})">Editar</button>
+                    <button onclick="deleteNoteEntry(${index}, ${note.id})">Excluir</button>
                 `;
                 notesList.appendChild(noteItem);
             });
@@ -575,33 +549,39 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    window.editNoteEntry = function (index) {
-        const noteIndex = notes.findIndex(note => note.profileName === currentProfileName.textContent && note.content === notes[index].content);
-        const newContent = prompt("Edite sua anotação:", notes[noteIndex].content);
-        if (newContent !== null && newContent.trim() !== "") {
-            notes[noteIndex].content = newContent.trim();
-            notes[noteIndex].date = new Date().toLocaleString();
-            localStorage.setItem('notes', JSON.stringify(notes));
-            renderNotes();
+    window.editNoteEntry = function (index, noteId) {
+        const noteContent = prompt("Edite sua anotação:", notes[index].content);
+        if (noteContent !== null && noteContent.trim() !== "") {
+            const updatedNote = { ...notes[index], content: noteContent.trim(), date: new Date().toLocaleString() };
+
+            fetch(`http://localhost:3000/api/anotacoes/${noteId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedNote)
+            }).then(response => {
+                if (response.ok) {
+                    fetchNotes(profiles[currentProfileIndex].id); // Recarregar as notas
+                    showFeedback("Anotação atualizada com sucesso!", "success");
+                } else {
+                    showFeedback("Erro ao atualizar anotação.", "error");
+                }
+            }).catch(error => {
+                console.error('Erro:', error);
+                showFeedback("Erro ao conectar ao servidor.", "error");
+            });
         }
     };
 
-    window.deleteNoteEntry = async function (index) {
-        const note = notes[index];
-        const noteId = note.id;
-
-        // Remover do localStorage
-        notes.splice(index, 1);
-        localStorage.setItem('notes', JSON.stringify(notes));
-
-        // Remover do banco de dados
+    window.deleteNoteEntry = async function (index, noteId) {
         try {
             const response = await fetch(`http://localhost:3000/api/anotacoes/${noteId}`, {
                 method: 'DELETE'
             });
 
             if (response.ok) {
-                renderNotes();
+                fetchNotes(profiles[currentProfileIndex].id); // Recarregar as notas
                 showFeedback("Anotação excluída com sucesso!", "success");
             } else {
                 showFeedback("Erro ao excluir anotação no servidor.", "error");
@@ -649,11 +629,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     startButton.addEventListener('click', function() {
-        if (profiles.length > 0) {
-            switchProfile(0);
-        } else {
-            switchToProfilePage();
-        }
+        fetchProfiles().then(() => {
+            if (profiles.length > 0) {
+                switchProfile(0);
+            } else {
+                switchToProfilePage();
+            }
+        });
     });
 
     backToCalculatorButtonProfile.addEventListener('click', function() {
@@ -665,7 +647,7 @@ document.addEventListener('DOMContentLoaded', function () {
         switchToCalculatorPage(currentProfileName.textContent);
     });
 
-    backToCalculatorButtonNotes.addEventListener('click', function() {
+    backToCalculatorButtonNotes.addEventListener('click', function () {
         notesModal.style.display = 'none';
         switchToCalculatorPage(currentProfileName.textContent);
     });
@@ -691,9 +673,4 @@ document.addEventListener('DOMContentLoaded', function () {
     toggleThemeButton.addEventListener('click', toggleTheme);
 
     loadTheme();
-
-    // Load profiles, history, and notes from the server when the page loads
-    loadProfiles();
-    loadHistory();
-    loadNotes();
 });
