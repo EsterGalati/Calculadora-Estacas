@@ -38,17 +38,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const addNoteButton = document.getElementById('add-note-button');
     const closeNotesButton = document.querySelector('.close-notes-button');
 
-    // Adiciona o botão "Adicionar Novo Perfil" dinamicamente
+    // Add "Add New Profile" button dynamically
     const addNewProfileButton = document.createElement('button');
     addNewProfileButton.id = 'addNewProfile-button';
     addNewProfileButton.innerText = 'Adicionar Novo Perfil';
-    addNewProfileButton.style.display = 'none'; // Escondido por padrão
+    addNewProfileButton.style.display = 'none'; // Hidden by default
 
     inputContainer.appendChild(addNewProfileButton);
 
-    let profiles = JSON.parse(localStorage.getItem('profiles')) || [];
-    let history = JSON.parse(localStorage.getItem('history')) || [];
-    let notes = JSON.parse(localStorage.getItem('notes')) || [];
+    let profiles = [];
+    let history = [];
+    let notes = [];
     let currentProfileIndex = null;
 
     const Ksolo = {
@@ -87,7 +87,82 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    function calculateResults() {
+    function showFeedback(message, type) {
+        const feedbackElement = document.createElement('div');
+        feedbackElement.className = `feedback ${type}`;
+        feedbackElement.textContent = message;
+
+        // Estilização básica para feedback visual
+        feedbackElement.style.position = 'fixed';
+        feedbackElement.style.bottom = '20px';
+        feedbackElement.style.right = '20px';
+        feedbackElement.style.padding = '10px';
+        feedbackElement.style.borderRadius = '5px';
+        feedbackElement.style.backgroundColor = type === 'success' ? 'green' : 'red';
+        feedbackElement.style.color = 'white';
+        feedbackElement.style.zIndex = '1000';
+
+        document.body.appendChild(feedbackElement);
+
+        setTimeout(() => {
+            feedbackElement.remove();
+        }, 3000);
+    }
+
+    async function loadProfiles() {
+        try {
+            const response = await fetch('http://localhost:3000/api/usuarios');
+            if (response.ok) {
+                profiles = await response.json();
+                localStorage.setItem('profiles', JSON.stringify(profiles));
+                renderProfiles();
+            } else {
+                showFeedback("Erro ao carregar perfis do servidor.", "error");
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            showFeedback("Erro ao conectar ao servidor.", "error");
+        }
+    }
+
+    async function loadHistory() {
+        try {
+            const response = await fetch('http://localhost:3000/api/historico');
+            if (response.ok) {
+                history = await response.json();
+                localStorage.setItem('history', JSON.stringify(history));
+                renderHistory();
+            } else {
+                showFeedback("Erro ao carregar histórico do servidor.", "error");
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            showFeedback("Erro ao conectar ao servidor.", "error");
+        }
+    }
+
+    async function loadNotes() {
+        try {
+            const response = await fetch('http://localhost:3000/api/anotacoes');
+            if (response.ok) {
+                notes = await response.json();
+                localStorage.setItem('notes', JSON.stringify(notes));
+                renderNotes();
+            } else {
+                showFeedback("Erro ao carregar anotações do servidor.", "error");
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            showFeedback("Erro ao conectar ao servidor.", "error");
+        }
+    }
+
+    async function calculateResults() {
+        if (currentProfileIndex === null || !profiles[currentProfileIndex]) {
+            alert("Por favor, selecione um perfil válido.");
+            return;
+        }
+
         const tipoSolo = document.getElementById('tipoSolo').value;
         const profundidade = parseFloat(document.getElementById('profundidade').value);
         const nspt = parseFloat(document.getElementById('nspt').value);
@@ -111,6 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const R = Rp + Rl;
 
         const result = {
+            userId: profiles[currentProfileIndex].id,
             tipoSolo,
             profundidade,
             nspt,
@@ -125,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
             profileName: currentProfileName.textContent
         };
 
-        saveToHistory(result);
+        await saveToHistory(result);
 
         resultadosDiv.innerHTML = `
             <p>Método utilizado: ${metodo}</p>
@@ -135,12 +211,103 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
     }
 
-    calcularButton.addEventListener('click', calculateResults);
-
-    function saveToHistory(result) {
+    async function saveToHistory(result) {
         history.push(result);
         localStorage.setItem('history', JSON.stringify(history));
+
+        try {
+            const response = await fetch('http://localhost:3000/api/historico', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(result)
+            });
+
+            if (response.ok) {
+                showFeedback("Histórico salvo com sucesso!", "success");
+            } else {
+                showFeedback("Erro ao salvar histórico no servidor.", "error");
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            showFeedback("Erro ao conectar ao servidor.", "error");
+        }
     }
+
+    calcularButton.addEventListener('click', calculateResults);
+
+    async function addNoteButtonHandler() {
+        const noteContent = newNoteContent.value.trim();
+        if (noteContent) {
+            const note = { userId: profiles[currentProfileIndex].id, content: noteContent, date: new Date().toLocaleString() };
+            notes.push(note);
+            localStorage.setItem('notes', JSON.stringify(notes));
+            newNoteContent.value = '';
+            renderNotes();
+
+            try {
+                const response = await fetch('http://localhost:3000/api/anotacoes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(note)
+                });
+
+                if (response.ok) {
+                    showFeedback("Anotação salva com sucesso!", "success");
+                } else {
+                    showFeedback("Erro ao salvar anotação no servidor.", "error");
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showFeedback("Erro ao conectar ao servidor.", "error");
+            }
+        } else {
+            alert("Por favor, escreva alguma coisa.");
+        }
+    }
+
+    addProfileButton.addEventListener('click', async function () {
+        const profileName = profileNameInput.value.trim();
+        const profileEmail = profileEmailInput.value.trim();
+        const profilePhone = profilePhoneInput.value.trim();
+        if (profileName && profileEmail && profilePhone) {
+            const profile = { name: profileName, email: profileEmail, phone: profilePhone };
+
+            try {
+                const response = await fetch('http://localhost:3000/api/usuarios', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(profile)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    profiles.push({ ...profile, id: result.userId });
+                    localStorage.setItem('profiles', JSON.stringify(profiles));
+                    profileNameInput.value = '';
+                    profileEmailInput.value = '';
+                    profilePhoneInput.value = '';
+                    renderProfiles();
+                    switchToCalculatorPage(profileName);
+                    showFeedback("Perfil adicionado com sucesso!", "success");
+                } else {
+                    showFeedback("Erro ao adicionar perfil.", "error");
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showFeedback("Erro ao conectar ao servidor.", "error");
+            }
+        } else {
+            alert("Por favor, preencha todos os campos.");
+        }
+    });
+
+    addNoteButton.addEventListener('click', addNoteButtonHandler);
 
     function exportResultsToPdf() {
         const { jsPDF } = window.jspdf;
@@ -197,62 +364,78 @@ document.addEventListener('DOMContentLoaded', function () {
         backToCalculatorButtonProfile.style.display = 'inline-block';
     }
 
-    window.deleteProfile = function (index) {
+    window.deleteProfile = async function (index) {
         const profile = profiles[index];
+        const profileId = profile.id;
         const profileName = profile.name;
-        
+
+        // Remover do localStorage
         profiles.splice(index, 1);
         localStorage.setItem('profiles', JSON.stringify(profiles));
-        
-        history = history.filter(entry => entry.profileName !== profileName);
-        localStorage.setItem('history', JSON.stringify(history));
-        
-        notes = notes.filter(note => note.profileName !== profileName);
-        localStorage.setItem('notes', JSON.stringify(notes));
-        
-        renderProfiles();
-        switchToProfilePage();
+
+        // Remover do banco de dados
+        try {
+            const response = await fetch(`http://localhost:3000/api/usuarios/${profileId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                history = history.filter(entry => entry.profileName !== profileName);
+                localStorage.setItem('history', JSON.stringify(history));
+                notes = notes.filter(note => note.profileName !== profileName);
+                localStorage.setItem('notes', JSON.stringify(notes));
+                renderProfiles();
+                switchToProfilePage();
+                showFeedback("Perfil excluído com sucesso!", "success");
+            } else {
+                showFeedback("Erro ao excluir perfil no servidor.", "error");
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            showFeedback("Erro ao conectar ao servidor.", "error");
+        }
     }
 
     window.switchProfile = function (index) {
-        currentProfileIndex = index;
-        const profile = profiles[index];
-        currentProfileName.textContent = profile.name;
-        switchToCalculatorPage(profile.name);
+        if (index >= 0 && index < profiles.length) {
+            currentProfileIndex = index;
+            const profile = profiles[index];
+            currentProfileName.textContent = profile.name;
+            switchToCalculatorPage(profile.name);
+        } else {
+            alert("Perfil inválido selecionado.");
+        }
     }
 
-    addProfileButton.addEventListener('click', function () {
+    updateProfileButton.addEventListener('click', async function () {
         const profileName = profileNameInput.value.trim();
         const profileEmail = profileEmailInput.value.trim();
         const profilePhone = profilePhoneInput.value.trim();
-        if (profileName && profileEmail && profilePhone) {
-            profiles.push({ name: profileName, email: profileEmail, phone: profilePhone });
-            localStorage.setItem('profiles', JSON.stringify(profiles));
-            profileNameInput.value = '';
-            profileEmailInput.value = '';
-            profilePhoneInput.value = '';
-            renderProfiles();
-            switchToCalculatorPage(profileName);
-        } else {
-            alert("Por favor, preencha todos os campos.");
-        }
-    });
-
-    updateProfileButton.addEventListener('click', function () {
-        const profileName = profileNameInput.value.trim();
-        const profileEmail = profileEmailInput.value.trim();
-        const profilePhone = profilePhoneInput.value.trim();
+        const profileId = profiles[currentProfileIndex].id;
         if (profileName && profileEmail && profilePhone && currentProfileIndex !== null) {
-            profiles[currentProfileIndex] = { name: profileName, email: profileEmail, phone: profilePhone };
+            profiles[currentProfileIndex] = { id: profileId, name: profileName, email: profileEmail, phone: profilePhone };
             localStorage.setItem('profiles', JSON.stringify(profiles));
-            profileNameInput.value = '';
-            profileEmailInput.value = '';
-            profilePhoneInput.value = '';
-            currentProfileIndex = null;
-            updateProfileButton.style.display = 'none';
-            addNewProfileButton.style.display = 'none';
-            renderProfiles();
-            switchToCalculatorPage(profileName);
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/usuarios/${profileId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name: profileName, email: profileEmail, phone: profilePhone })
+                });
+
+                if (response.ok) {
+                    showFeedback("Perfil atualizado com sucesso!", "success");
+                    renderProfiles();
+                    switchToCalculatorPage(profileName);
+                } else {
+                    showFeedback("Erro ao atualizar perfil.", "error");
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showFeedback("Erro ao conectar ao servidor.", "error");
+            }
         }
     });
 
@@ -337,10 +520,30 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    window.deleteHistoryEntry = function (index) {
+    window.deleteHistoryEntry = async function (index) {
+        const entry = history[index];
+        const entryId = entry.id;
+
+        // Remover do localStorage
         history.splice(index, 1);
         localStorage.setItem('history', JSON.stringify(history));
-        renderHistory();
+
+        // Remover do banco de dados
+        try {
+            const response = await fetch(`http://localhost:3000/api/historico/${entryId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                renderHistory();
+                showFeedback("Histórico excluído com sucesso!", "success");
+            } else {
+                showFeedback("Erro ao excluir histórico no servidor.", "error");
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            showFeedback("Erro ao conectar ao servidor.", "error");
+        }
     }
 
     viewNotesNavButton.addEventListener('click', function () {
@@ -350,18 +553,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     closeNotesButton.addEventListener('click', function () {
         notesModal.style.display = 'none';
-    });
-
-    addNoteButton.addEventListener('click', function () {
-        const noteContent = newNoteContent.value.trim();
-        if (noteContent) {
-            notes.push({ content: noteContent, date: new Date().toLocaleString(), profileName: currentProfileName.textContent });
-            localStorage.setItem('notes', JSON.stringify(notes));
-            newNoteContent.value = '';
-            renderNotes();
-        } else {
-            alert("Por favor, escreva alguma coisa.");
-        }
     });
 
     function renderNotes() {
@@ -395,12 +586,31 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    window.deleteNoteEntry = function (index) {
-        const noteIndex = notes.findIndex(note => note.profileName === currentProfileName.textContent && note.content === notes[index].content);
-        notes.splice(noteIndex, 1);
+    window.deleteNoteEntry = async function (index) {
+        const note = notes[index];
+        const noteId = note.id;
+
+        // Remover do localStorage
+        notes.splice(index, 1);
         localStorage.setItem('notes', JSON.stringify(notes));
-        renderNotes();
-    };
+
+        // Remover do banco de dados
+        try {
+            const response = await fetch(`http://localhost:3000/api/anotacoes/${noteId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                renderNotes();
+                showFeedback("Anotação excluída com sucesso!", "success");
+            } else {
+                showFeedback("Erro ao excluir anotação no servidor.", "error");
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            showFeedback("Erro ao conectar ao servidor.", "error");
+        }
+    }
 
     function switchToCalculatorPage(profileName) {
         if (profileName) {
@@ -440,7 +650,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     startButton.addEventListener('click', function() {
         if (profiles.length > 0) {
-            switchToCalculatorPage(profiles[0].name);
+            switchProfile(0);
         } else {
             switchToProfilePage();
         }
@@ -459,14 +669,6 @@ document.addEventListener('DOMContentLoaded', function () {
         notesModal.style.display = 'none';
         switchToCalculatorPage(currentProfileName.textContent);
     });
-
-    renderProfiles();
-
-    if (profiles.length > 0) {
-        switchToCalculatorPage(profiles[0].name);
-    } else {
-        addProfileButton.style.display = 'inline-block';
-    }
 
     function toggleTheme() {
         document.body.classList.toggle('dark-theme');
@@ -489,6 +691,9 @@ document.addEventListener('DOMContentLoaded', function () {
     toggleThemeButton.addEventListener('click', toggleTheme);
 
     loadTheme();
+
+    // Load profiles, history, and notes from the server when the page loads
+    loadProfiles();
+    loadHistory();
+    loadNotes();
 });
-
-
